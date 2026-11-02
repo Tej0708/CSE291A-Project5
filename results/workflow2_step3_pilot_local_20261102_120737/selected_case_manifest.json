@@ -1,0 +1,79 @@
+{
+  "created_utc": "2026-11-02T20:07:39.722658+00:00",
+  "baseline_manifest": "results/helper_scope_v3_full/clean_audit_20261102_111235_89734943/manifest.json",
+  "model": "api-glm-5.3-flash",
+  "temperature": 0.0,
+  "generation_settings": {
+    "temperature": 0.0,
+    "other_parameters": "omitted, provider defaults; matches baseline request"
+  },
+  "transport": {
+    "max_retries": 0,
+    "timeout_seconds": 120,
+    "note": "No retries; stop entire pilot on first API/runtime error."
+  },
+  "source_hashes": {
+    "run_clean_audit.py": "1d07a45a6c0c0ac11b12d6f71039b2d4cb4e6a26ebe456fe90da85559673e358",
+    "run_live_pilot.py": "ea433e61c2c01885deae86f23060e60c9e8c0f29c9941d682063ec194f7c3e44",
+    "support_cases_unique40.jsonl": "86cef96af2788fde6bab05ca50520de653c1f9c8522f646611fbad5cffe158cc",
+    "run_fault_audit.py": "70f47cf8c08cceb78d9c6c29eaf1af9ede809261c2c76367961278f4fa9a5a60",
+    "csa_workflow/run.py": "69567591741795a166a53d017fe7cff8a2294f095b7c97ed062aaac543fe18b7",
+    "csa_workflow/services.py": "c530fd20a5bde6c138e03b88fb877c822398d399e889d4db4d9747a657603fa3",
+    "csa_workflow/__init__.py": "80c37975b4db383b2694d4c09c480422fa77eb2494cc420e6fa7a734e21bf11e",
+    "csa_workflow/llm.py": "ffd8daee24856ebdaaed4d5b2174007c0317bea85d75badb37b9497dd4903abf",
+    "csa_workflow/agents.py": "d46ba2ec70996e1b51093fd54ad41340489f4f6ffaf7254540d8ef0d563541bf",
+    "csa_workflow/dataset.py": "f5b2088ecb9c329bc8a5acc69a20b01a7f9d08389ef567094620d7d196a9da46",
+    "csa_workflow/scenario_records.json": "3054fef3640788e41c65fc96db4a071b5b15198934edaf1295cddd5053ff40e6",
+    "csa_workflow/taxonomy.py": "c59fddbd90469bb1027e43c4e4c23172a83cd5e9c41b6c0d7becf6af5256425f",
+    "csa_workflow/orchestrator.py": "acc622e878ee30341dae6994e32a677e641acd50253a10237d6e524a6015156f",
+    "csa_workflow/state.py": "b5adc73157fb716370866427156f2ea5892c3d7ec6033af82080da621afb16db",
+    "csa_workflow/faults.py": "ce65466d4c6476a0e7dae6c92c3205aa755ae8d5ba8192ea2de9ee820c30c80e"
+  },
+  "selection": [
+    {
+      "clean_id": "BASE-0003-NONE",
+      "fault_id": "BASE-0003-QA_CORRUPTION",
+      "reason": "Requested anchor: duplicate charge and settings crash.",
+      "max_iterations": 4,
+      "expected_issues": [
+        "duplicate_charge",
+        "app_crash"
+      ]
+    },
+    {
+      "clean_id": "BASE-0004-NONE",
+      "fault_id": "BASE-0004-QA_CORRUPTION",
+      "reason": "Incorrect invoice and settings crash; technical issue appears first in text.",
+      "max_iterations": 4,
+      "expected_issues": [
+        "incorrect_invoice",
+        "app_crash"
+      ]
+    },
+    {
+      "clean_id": "BASE-0007-NONE",
+      "fault_id": "BASE-0007-QA_CORRUPTION",
+      "reason": "Charge after cancellation and login failure; distinct technical/billing pair.",
+      "max_iterations": 4,
+      "expected_issues": [
+        "charge_after_cancellation",
+        "login_failure"
+      ]
+    },
+    {
+      "clean_id": "BASE-0006-NONE",
+      "fault_id": "BASE-0006-QA_CORRUPTION",
+      "reason": "Single duplicate-charge issue; expected no missing issue after first helper.",
+      "max_iterations": 4,
+      "expected_issues": [
+        "duplicate_charge"
+      ]
+    }
+  ],
+  "order": "selected order, clean then fault, serial; fresh run_case state each execution",
+  "decision_sources": {
+    "model": "classification, helper prose, QA candidate while unresolved",
+    "deterministic": "classification filtering/fallback, Router selection, tools, evidence acceptance, QA label validation/reason, injector, termination"
+  },
+  "reproduction_command": ".venv/bin/python run_live_pilot.py --execute --output results/workflow2_step3_pilot_local_20261102_120737_reproduction"
+}
