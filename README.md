@@ -1,6 +1,54 @@
-# Workflow 2 Progress Update
+# Workflow 2 — current progress and team handoff
 
-## Current Status
+Updated 2026-11-02. **Formal QA-corruption experiment preparation is complete; the formal experiment has NOT been run.** Restart and always-verify are not implemented. Preparation used offline scripted fixtures only, with no model/provider calls.
+
+## Current progress
+
+- Completed the helper-scope fix and v3 clean baseline; preserved historical datasets, prompts, raw traces and assessment revisions.
+- Completed the bounded live pilot: eight completed runs, three activated mixed-issue fault cases and one non-activation control. Activation caused repeated work followed by continuation to unresolved work; this is not full-restart recovery.
+- Recorded the final pilot review and frozen evaluation rules. Latest-answer quality is 4 PASS / 4 FAIL runs; all 17 drafts contain 9 PASS / 8 FAIL. These judgments include preliminary Codex assessments and two scoped user adjudications, not blanket human sign-off.
+- Added a separate formal observer with invocation-time stage/iteration, symmetric clean/fault Router receipt/action records, linked run/event/call IDs and complete nullable provider usage.
+- Verified 20 mixed technical/billing cases from the dataset and froze **40 runs**: one clean + one `qa_first_missing_once_v1` per case, 10 clean-first / 10 fault-first, seed `20261102`, original budgets and pilot model/settings.
+- Offline validation passed **31 workflow tests + 9 review-tool tests**, including 160 plain/observed fixture comparisons. Preparation verified 374 pre-existing files unchanged; this handoff subsequently updates documentation only.
+
+## Where teammates should align logging schema and metrics
+
+**Start with [TEAM_HANDOFF.md](TEAM_HANDOFF.md).** It maps each contract to its schema, implementation and tests, and distinguishes raw observations from derived metrics.
+
+| Need | Files to read |
+| --- | --- |
+| Logging event fields, IDs, stage/iteration, dependencies | [event.schema.json](formal_experiment/event.schema.json), [formal_observer.py](formal_observer.py) |
+| Raw per-run results, calls, usage, drafts and injection evidence | [result.schema.json](formal_experiment/result.schema.json), [formal_observer.py](formal_observer.py) |
+| Activation, repeated work, affected stages, overhead and paired deltas | [metrics.schema.json](formal_experiment/metrics.schema.json), [paired_result.schema.json](formal_experiment/paired_result.schema.json), `evaluate()` in [run_formal_experiment.py](run_formal_experiment.py) |
+| Answer-quality definitions and review fields | [BASELINE_EVALUATION_RULES.md](BASELINE_EVALUATION_RULES.md), [draft_assessment.schema.json](formal_experiment/draft_assessment.schema.json), [latest_answer_quality.schema.json](formal_experiment/latest_answer_quality.schema.json) |
+| Frozen cases, schedule and settings | [manifest.json](formal_experiment/manifest.json) |
+| Protocol, reproducible commands and remaining Phase 1 checklist | [PLAN.md](formal_experiment/PLAN.md) |
+| Test evidence and preservation | [Preparation report](formal_experiment/REPORT.md), [workflow tests](formal_experiment/tests.txt), [review-tool tests](formal_experiment/review_tests_with_loopback.txt) |
+| Final pilot findings and judgment provenance | [Final pilot report](results/workflow2_step3_pilot_local_20261102_120737/evaluation_user_adjudicated/REPORT.md) |
+
+## Next direction
+
+1. Align teammates on the logging and metric contracts linked above. Keep ledger completion, latest-per-issue answer quality and all-draft quality separate.
+2. Verify the frozen manifest and obtain explicit authorization before live execution. Do not change prompts/settings or add defenses inside this frozen experiment.
+3. Execute the 40-run schedule serially with fresh state per run. Keep skipped/ineligible/error/not-attempted slots; no replacement or outcome-dependent reruns.
+4. Inspect activation and Router-consumption evidence, perform offline review of every draft under the frozen rules, then publish paired overhead and separate quality results with explicit denominators.
+5. Consider restart and always-verify only as a later, separately specified implementation/evaluation phase with matching baselines.
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python run_formal_experiment.py verify
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -v
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s human_review_tool -p 'test_*.py' -v
+```
+
+The review-tool HTTP test needs local loopback permission. Future execution and offline evaluation commands are in [PLAN.md](formal_experiment/PLAN.md); they are not instructions to run the experiment now.
+
+---
+
+The earlier v2 progress record below is retained for context. Its pending-work statements describe that milestone, not the current state above.
+
+# Historical progress: v2 baseline
+
+## Status at the v2 milestone
 
 The customer-support workflow runs locally with both rule-based and LLM backends:
 
@@ -85,7 +133,7 @@ These records are preauthored simulated environment facts, not real transactions
 
 Answer review nevertheless found unsupported claims and scenario/tool mismatches. These results are retained as development results, not final end-to-end success evidence.
 
-### Current v2
+### v2 validation at that milestone
 
 - 17 offline regression tests passed.
 - Scripted-model tests covered all 40 clean requests.
@@ -108,7 +156,7 @@ Offline scripted tests are not evidence of live-model accuracy.
 - The audit reference uses the same fixture service; semantic correctness still requires independent review.
 
 
-## Next Steps
+## Next steps recorded at the v2 milestone (superseded above)
 
 1. Review the latest v2 answers and confirm the run used the intended code and fixture versions.
 2. Finalize and document the task-success scoring criteria.

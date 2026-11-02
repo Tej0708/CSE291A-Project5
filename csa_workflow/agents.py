@@ -8,7 +8,7 @@ dropped in later without changing the orchestration contract.
 from __future__ import annotations
 
 from . import services
-from .faults import FaultInjector, QAFeedback
+from .faults import FaultInjector, QAFeedback, QA_FIRST_MISSING_ONCE_V1
 from .llm import LLMClient, classify_issues, generate_response, judge_quality
 from .state import Evidence, IssueStatus, WorkflowState
 from .taxonomy import ISSUE_KEYWORDS, ISSUE_ROUTE
@@ -140,4 +140,6 @@ class QAAgent:
             feedback = QAFeedback(False, missing, reason)
 
         # QA->Router feedback is the qa_corruption injection point.
+        if self.injector.cfg.get("profile") == QA_FIRST_MISSING_ONCE_V1:
+            return self.injector.on_qa_feedback(state.iteration, feedback, state=state)
         return self.injector.on_qa_feedback(state.iteration, feedback)
