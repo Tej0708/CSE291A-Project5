@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from typing import Any, TypeVar
+from dataclasses import asdict
+import time
 
 from pydantic import BaseModel
 
 from .artifact import AgentArtifact, SourceRef, make_agent_artifact
-from .model_client import StructuredModelClient
+from .model_client import ModelCallError, ModelUsage, StructuredModelClient
 from .trace import TraceLogger
 
 T = TypeVar("T", bound=BaseModel)
@@ -42,10 +44,12 @@ class StructuredAgent:
         logger.log(
             "agent_started",
             stage=self.name,
-            data={"input": payload},
+            data={"input": payload, "system_prompt": self.system_prompt,
+                  "output_schema": self.output_schema.model_json_schema()},
             parent_ids=source_ids,
         )
 
+        started = time.perf_counter()
         try:
             result = self.model_client.generate(
                 system_prompt=self.system_prompt,
@@ -56,7 +60,14 @@ class StructuredAgent:
             logger.log(
                 "agent_failed",
                 stage=self.name,
-                data={"error": repr(exc)},
+                data={
+                    "error": str(exc),
+                    "error_type": getattr(exc, "error_type", type(exc).__name__),
+                    "latency_ms": getattr(exc, "latency_ms", (time.perf_counter() - started) * 1000),
+                    "raw_model_output": getattr(exc, "raw_text", None),
+                    "model_name": getattr(exc, "model_name", None),
+                    "usage": asdict(exc.usage if isinstance(exc, ModelCallError) else ModelUsage()),
+                },
                 parent_ids=source_ids,
             )
             raise

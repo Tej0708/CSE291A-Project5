@@ -3,10 +3,10 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
-from core.artifact import artifact_source, tool_event_source
+from core.artifact import AgentArtifact, artifact_source, tool_event_source
 from core.model_client import StructuredModelClient
 from core.trace import TraceLogger
-from core.workflow import Workflow, WorkflowResult
+from core.workflow import CheckResult, Workflow, WorkflowResult
 from data.loader import DEFAULT_DATASET_PATH
 
 from .agents import build_agents
@@ -53,6 +53,41 @@ class FulfillmentWorkflow(Workflow):
             data={"initial_state": state.snapshot()},
         )
 
+        artifacts: list[AgentArtifact] = []
+        error = error_type = failed_stage = None
+        run_status = "completed"
+        try:
+            self._execute(task_id, tools, logger, artifacts)
+            check = check_fulfillment_run(
+                order_id=task_id, dataset=self.dataset, initial_state=initial_state,
+                final_state=state, inventory_artifact=artifacts[0],
+                pricing_artifact=artifacts[1], shipping_artifact=artifacts[2],
+                plan_artifact=artifacts[3], executor_artifact=artifacts[4],
+            )
+        except Exception as exc:
+            run_status = "error"
+            error, error_type = str(exc), getattr(exc, "error_type", type(exc).__name__)
+            failed_stage = logger.last_stage
+            check = CheckResult(False, (f"{failed_stage}: {error}",))
+
+        logger.log(
+            "workflow_completed", data={
+                "outcome": state.order_status, "run_status": run_status,
+                "check_passed": check.passed, "check_errors": list(check.errors),
+                "failed_stage": failed_stage, "error_type": error_type, "error": error,
+                "final_state": state.snapshot(),
+            }, parent_ids=[a.artifact_id for a in artifacts[-1:]],
+        )
+        return WorkflowResult(
+            workflow=self.name, task_id=task_id, run_id=logger.run_id,
+            outcome=state.order_status, artifacts=tuple(artifacts), check=check,
+            log_path=str(logger.path), run_status=run_status, failed_stage=failed_stage,
+            error_type=error_type, error=error, initial_state=initial_state.snapshot(),
+            final_state=state.snapshot(),
+        )
+
+    def _execute(self, task_id: str, tools: FulfillmentTools, logger: TraceLogger,
+                 artifacts: list[AgentArtifact]) -> None:
         order_context, order_event_id = tools.get_order_context(task_id)
 
         inventory_input, inventory_event_id = tools.get_inventory_inputs(task_id)
@@ -61,6 +96,7 @@ class FulfillmentWorkflow(Workflow):
             logger=logger,
             sources=[tool_event_source(inventory_event_id)],
         )
+        artifacts.append(inventory_artifact)
 
         pricing_input, pricing_event_id = tools.get_pricing_inputs(task_id)
         pricing_artifact = self.agents.pricing.run(
@@ -68,6 +104,7 @@ class FulfillmentWorkflow(Workflow):
             logger=logger,
             sources=[tool_event_source(pricing_event_id)],
         )
+        artifacts.append(pricing_artifact)
 
         shipping_input, shipping_event_id = tools.get_shipping_inputs(task_id)
         shipping_artifact = self.agents.shipping.run(
@@ -75,6 +112,7 @@ class FulfillmentWorkflow(Workflow):
             logger=logger,
             sources=[tool_event_source(shipping_event_id)],
         )
+        artifacts.append(shipping_artifact)
 
         plan_artifact = self.agents.planner.run(
             payload={
@@ -91,6 +129,7 @@ class FulfillmentWorkflow(Workflow):
                 artifact_source(shipping_artifact),
             ],
         )
+        artifacts.append(plan_artifact)
 
         executor_artifact = self.agents.executor.run(
             payload={
@@ -103,6 +142,7 @@ class FulfillmentWorkflow(Workflow):
                 artifact_source(plan_artifact),
             ],
         )
+        artifacts.append(executor_artifact)
 
         execution = ExecutionDecision.model_validate(executor_artifact.value)
         for action in execution.actions:
@@ -110,42 +150,3 @@ class FulfillmentWorkflow(Workflow):
                 action,
                 triggered_by_artifact_id=executor_artifact.artifact_id,
             )
-
-        check = check_fulfillment_run(
-            order_id=task_id,
-            dataset=self.dataset,
-            initial_state=initial_state,
-            final_state=state,
-            inventory_artifact=inventory_artifact,
-            pricing_artifact=pricing_artifact,
-            shipping_artifact=shipping_artifact,
-            plan_artifact=plan_artifact,
-            executor_artifact=executor_artifact,
-        )
-
-        logger.log(
-            "workflow_completed",
-            data={
-                "outcome": state.order_status,
-                "check_passed": check.passed,
-                "check_errors": list(check.errors),
-                "final_state": state.snapshot(),
-            },
-            parent_ids=[executor_artifact.artifact_id],
-        )
-
-        return WorkflowResult(
-            workflow=self.name,
-            task_id=task_id,
-            run_id=logger.run_id,
-            outcome=state.order_status,
-            artifacts=(
-                inventory_artifact,
-                pricing_artifact,
-                shipping_artifact,
-                plan_artifact,
-                executor_artifact,
-            ),
-            check=check,
-            log_path=str(logger.path),
-        )

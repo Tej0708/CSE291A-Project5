@@ -4,6 +4,7 @@ import argparse
 
 from core.config import load_settings
 from experiments.run_clean import run_clean_workflow
+from experiments.records import experiment_directory
 from workflows.registry import list_workflow_names
 
 
@@ -34,6 +35,7 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help="Number of repetitions per selected task (default: 1).",
     )
+    parser.add_argument("--output-dir", help="New directory for manifest, traces, and results.")
     return parser.parse_args()
 
 
@@ -48,6 +50,8 @@ def main() -> int:
         settings=settings,
         task_ids=args.task_ids,
         repetitions=args.runs,
+        output_dir=args.output_dir or experiment_directory('clean'),
+        progress=True,
     )
 
     any_failed = False

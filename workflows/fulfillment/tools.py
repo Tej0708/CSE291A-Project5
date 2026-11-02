@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Any
+import time
 
 from core.trace import TraceLogger
 
@@ -129,6 +130,28 @@ class FulfillmentTools:
         action: ToolAction,
         *,
         triggered_by_artifact_id: str,
+    ) -> dict[str, Any]:
+        before = self.state.snapshot()
+        started = time.perf_counter()
+        self.logger.log("tool_started", stage=action.tool,
+                        data={"arguments": action.model_dump(mode="json"), "mutates_state": True},
+                        parent_ids=[triggered_by_artifact_id])
+        try:
+            return self._execute_action(action, triggered_by_artifact_id=triggered_by_artifact_id)
+        except Exception as exc:
+            self.logger.log(
+                "tool_failed", stage=action.tool,
+                data={"tool": action.tool, "arguments": action.model_dump(mode="json"),
+                      "error": str(exc), "error_type": type(exc).__name__,
+                      "latency_ms": (time.perf_counter() - started) * 1000,
+                      "mutates_state": True, "before_state": before,
+                      "after_state": self.state.snapshot()},
+                parent_ids=[triggered_by_artifact_id],
+            )
+            raise
+
+    def _execute_action(
+        self, action: ToolAction, *, triggered_by_artifact_id: str,
     ) -> dict[str, Any]:
         if isinstance(action, ReserveInventoryAction):
             return self.reserve_inventory(

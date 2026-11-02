@@ -147,3 +147,9 @@ State-changing tools used by the Executor:
 - `update_order_status`
 
 `dataset.json` is never mutated. Each run creates a new `FulfillmentState`.
+
+## Phase 1 checkpoints
+
+Step 1 records failed model/tool calls, unknown token usage, partial state, and terminal
+results. Batch runs preserve JSONL traces and reproducibility manifests. Model requests
+have a 60-second timeout and no automatic SDK retries. See [progress](docs/phase1-progress.md).

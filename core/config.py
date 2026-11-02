@@ -12,6 +12,7 @@ class Settings:
     base_url: str
     model_name: str
     log_dir: str = "logs"
+    request_timeout_s: float = 60.0
 
 
 def load_settings() -> Settings:
@@ -25,7 +26,7 @@ def load_settings() -> Settings:
             "Add it to .env or export it in your shell."
         )
 
-    base_url = os.getenv("OPENAI_BASE_URL", "https://tritonai-api.ucsd.edu/v1")
+    base_url = os.getenv("OPENAI_BASE_URL") or "https://tritonai-api.ucsd.edu/v1"
     model_name = os.getenv("MODEL_NAME", "api-glm-5.3-flash")
     log_dir = os.getenv("LOG_DIR", "logs")
 
@@ -34,4 +35,5 @@ def load_settings() -> Settings:
         base_url=base_url,
         model_name=model_name,
         log_dir=log_dir,
+        request_timeout_s=float(os.getenv("REQUEST_TIMEOUT_S", "60")),
     )

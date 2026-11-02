@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,8 @@ class TraceLogger:
         self.workflow = workflow
         self.task_id = task_id
         self.run_id = run_id or str(uuid4())
+        self.started = time.perf_counter()
+        self.last_stage: str | None = None
 
         directory = Path(log_dir) / workflow / task_id
         directory.mkdir(parents=True, exist_ok=True)
@@ -35,10 +38,13 @@ class TraceLogger:
         parent_ids: list[str] | tuple[str, ...] | None = None,
     ) -> str:
         event_id = str(uuid4())
+        if stage is not None:
+            self.last_stage = stage
         record = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "run_id": self.run_id,
             "event_id": event_id,
+            "elapsed_ms": round((time.perf_counter() - self.started) * 1000, 3),
             "workflow": self.workflow,
             "task_id": self.task_id,
             "event_type": event_type,

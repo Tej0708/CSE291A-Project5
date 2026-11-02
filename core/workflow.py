@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
 from .artifact import AgentArtifact
 
@@ -21,6 +22,12 @@ class WorkflowResult:
     artifacts: tuple[AgentArtifact, ...]
     check: CheckResult
     log_path: str
+    run_status: str = "completed"
+    failed_stage: str | None = None
+    error_type: str | None = None
+    error: str | None = None
+    initial_state: dict[str, Any] | None = None
+    final_state: dict[str, Any] | None = None
 
 
 class Workflow(ABC):

@@ -14,9 +14,9 @@ T = TypeVar("T", bound=BaseModel)
 
 @dataclass(frozen=True)
 class ModelUsage:
-    input_tokens: int = 0
-    output_tokens: int = 0
-    total_tokens: int = 0
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
 
 
 @dataclass(frozen=True)
@@ -26,6 +26,20 @@ class ModelResult:
     usage: ModelUsage
     latency_ms: float
     model_name: str
+
+
+class ModelCallError(RuntimeError):
+    """A failed call, including a received response that failed parsing."""
+
+    def __init__(self, *, error_type: str, latency_ms: float,
+                 model_name: str, raw_text: str | None = None,
+                 usage: ModelUsage | None = None) -> None:
+        super().__init__(f"Model call failed: {error_type}")
+        self.error_type = error_type
+        self.latency_ms = latency_ms
+        self.model_name = model_name
+        self.raw_text = raw_text
+        self.usage = usage or ModelUsage()
 
 
 class StructuredModelClient(Protocol):
@@ -54,6 +68,8 @@ class TritonModelClient:
         self._client = OpenAI(
             api_key=settings.api_key,
             base_url=settings.base_url,
+            timeout=settings.request_timeout_s,
+            max_retries=0,
         )
 
     def generate(
@@ -70,7 +86,8 @@ class TritonModelClient:
         }
 
         started = time.perf_counter()
-        response = self._client.chat.completions.create(
+        try:
+            response = self._client.chat.completions.create(
             model=self._model_name,
             temperature=0,
             messages=[
@@ -87,19 +104,31 @@ class TritonModelClient:
                     "content": json.dumps(user_content),
                 },
             ],
-        )
+            )
+        except Exception as exc:
+            # Provider exceptions may contain endpoint details; log the type only.
+            raise ModelCallError(
+                error_type=type(exc).__name__,
+                latency_ms=(time.perf_counter() - started) * 1000,
+                model_name=self._model_name,
+            ) from exc
         latency_ms = (time.perf_counter() - started) * 1000
 
         raw_text = response.choices[0].message.content or ""
-        parsed = self._parse_json(raw_text)
-        value = output_schema.model_validate(parsed)
-
         usage = getattr(response, "usage", None)
         model_usage = ModelUsage(
-            input_tokens=getattr(usage, "prompt_tokens", 0) or 0,
-            output_tokens=getattr(usage, "completion_tokens", 0) or 0,
-            total_tokens=getattr(usage, "total_tokens", 0) or 0,
+            input_tokens=getattr(usage, "prompt_tokens", None),
+            output_tokens=getattr(usage, "completion_tokens", None),
+            total_tokens=getattr(usage, "total_tokens", None),
         )
+        try:
+            parsed = self._parse_json(raw_text)
+            value = output_schema.model_validate(parsed)
+        except Exception as exc:
+            raise ModelCallError(
+                error_type=type(exc).__name__, latency_ms=latency_ms,
+                model_name=self._model_name, raw_text=raw_text, usage=model_usage,
+            ) from exc
 
         return ModelResult(
             value=value,
