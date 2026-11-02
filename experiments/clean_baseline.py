@@ -1,10 +1,8 @@
 """One clean baseline pass with a small, explicit API allowance."""
 import argparse
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
-import shutil
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
@@ -12,7 +10,7 @@ from urllib.request import Request, urlopen
 from core.api_budget import BudgetedModelClient
 from core.config import load_settings
 from core.model_client import TritonModelClient
-from experiments.records import experiment_directory, write_json
+from experiments.records import experiment_directory, save_source, write_json
 from experiments.run_clean import run_clean_workflow
 
 GATEWAY = 'https://tritonai-api.ucsd.edu'
@@ -51,20 +49,6 @@ def public_price(model):
             'output_cost_per_token': model_info['output_cost_per_token'],
             'source_url': GATEWAY + '/public/model_hub',
             'fetched_at_utc': datetime.now(timezone.utc).isoformat()}
-
-
-def save_source(destination):
-    """Preserve only the exact code/data files named by the run manifest."""
-    root = Path(__file__).resolve().parents[1]
-    metadata = json.loads((destination / 'manifest.json').read_text())
-    files = {**metadata['code_sha256'], 'data/dataset.json': metadata['dataset_sha256']}
-    for relative, expected_hash in files.items():
-        source = root / relative
-        if hashlib.sha256(source.read_bytes()).hexdigest() != expected_hash:
-            raise RuntimeError(f'Source changed during the run: {relative}')
-        target = destination / 'source' / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
 
 
 def write_analysis(destination, rows, spend):

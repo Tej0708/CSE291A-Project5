@@ -1,7 +1,8 @@
 # Phase 1 progress: first inventory workflow
 
 Working branch: `fulfillment-steps`, based on `order-fulfillment-nk`.
-Scope: Idea 2, first workflow (order fulfillment). Completed steps are recorded in separate local commits.
+Scope: Idea 2, first workflow (order fulfillment). Completed steps have separate local
+commits. Later-step prototypes remain uncommitted. Nothing has been pushed.
 
 Work proceeds one recommended step at a time. Stop at each checkpoint and report changes,
 API usage, findings, and the next step. Use `api-glm-5.3-flash`, one pilot repetition, and
@@ -46,23 +47,60 @@ preserve the $50-per-key budget. Offline tests use fake models and spend no API 
   [follow-up provider balance](../results/fulfillment/clean_baseline_step2/key_usage_followup.json),
   [artifact verification](../results/fulfillment/clean_baseline_step2/verification.json).
 
+## Step 3: controlled fault-injection review — complete offline
+
+- Verified all 10 default schedules against three paired clean controls. Each activates
+  exactly once and has trace evidence at its intended agent, action, parser, or timeout
+  boundary. Original/injected values, consumer event IDs, and dependency checks are saved.
+- Fixed F-FUL-08: the old total-only planner fault did not change executor behavior. The
+  schedule now sets shipping cost to zero and total to the $25 subtotal; executor copies
+  the wrong shipping cost into the simulated shipment. The faulty payload remains coherent.
+- Invalid stage/surface combinations, unsupported tool-call mutations, invalid paths, and
+  no-op changes now fail as experiment configuration errors. They cannot be mislabeled as
+  applied faults or counted as recovery trials. Failed configuration is not retried.
+- Made F-FUL-04's augmentation explicit: old timestamp plus synthetic historical stock=5.
+  Current stock is 0. A timestamp-only control leaves all artifacts and the task correct;
+  a total-only planner control changes the quote but leaves executor actions/state unchanged.
+- Nine accidental scenarios demonstrate task impact under the scripted model. Prompt
+  injection demonstrates payload delivery only: the scripted model ignores instructions,
+  so its correct result is not evidence of live-model resistance. Live fault tests remain pending.
+- Early malformed JSON and timeout stop before the inventory agent runs. The late timeout
+  occurs after stock reservation and before shipment creation. Both timeout schedules were
+  exercised with their actual configured 1,500 ms delays in the saved offline review.
+- Replayed all 30 saved clean-baseline responses offline. All 150 prompts, input payloads,
+  and schemas matched exactly, and all final business states matched. No billed baseline
+  rerun was needed. Original Step 2 results and dataset remain unchanged.
+- Validation: 42 tests passed; both diagnostic controls passed; all 42 review source/data
+  snapshot hashes and all 35 original baseline snapshot hashes verified.
+- API usage this step: **0 requests, 0 tokens, $0**. The review blocks socket connections
+  and never loads API credentials. Last confirmed provider key spending remains the Step 2
+  snapshot, $0.03098815 of $50; no new balance query was made.
+- [Review report](../results/fulfillment/fault_review_step3/analysis.md),
+  [per-fault evidence and baseline replay](../results/fulfillment/fault_review_step3/summary.json),
+  [reproducible offline runner](../experiments/review_faults.py).
+
 ## Usage ledger through this checkpoint
+
+The Git split preserves the exact historical experiment snapshots. Those archives include
+prepared later-step prototypes from the original execution environment; they are evidence,
+not active implementations added by the corresponding checkpoint commit. Each committed
+step is independently runnable. See [commit validation](commit-checkpoints.md).
 
 | Run | API requests attempted | Reported tokens | Cost from reported token usage |
 |---|---:|---:|---:|
 | Earlier development pilot | 110 | 64,925 | $0.01224510 |
 | Step 2 baseline | 150 | 99,707 | $0.01874305 |
+| Step 3 offline review | 0 | 0 | $0 |
 | Total | 260 | 164,632 | $0.03098815 |
 
 The earlier pilot's 10 rate-limited requests have unknown token usage; the cumulative token
 count is the reported lower bound. Provider spending is authoritative and agrees with the
 reported-token cost total at the follow-up snapshot (2026-11-02 06:25:05 UTC).
 
-Stopped after Step 2. Next checkpoint is offline validation of fault activation and consumption.
+Stopped after Step 3. Next checkpoint is offline validation of propagation, unauthorized
+action, and wasted-work metrics. No live experiment is needed for that review.
 
 ## Remaining checkpoints
-
-3. Review controlled fault activation, consumption, and relevance offline.
 
 4. Validate propagation and policy-violation metrics, including affected stages, unauthorized
    actions, wasted work, and end-to-end performance; keep accidental/adversarial results separate.
@@ -74,6 +112,3 @@ Code for metrics and comparison checkpoints was already prepared before the one-
 checkpoint preference was clarified. Its fake-model tests passing does not mean those
 checkpoints or their live experiments are complete. No live fault matrix has run.
 Selective recovery belongs to Phase 2.
-
-Historical source snapshots under results/ preserve the exact experiment versions, including
-prepared later-step prototypes. Active code in this commit contains the clean workflow only.

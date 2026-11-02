@@ -1,8 +1,8 @@
 # CSE 291A Multi-Agent Failure Recovery 
 
 This branch implements the order-fulfillment workflow and Phase 1 experiment tooling.
-The clean baseline is complete. Fault injection and comparison methods remain later
-checkpoints; no live fault experiments have run. See
+The clean baseline and offline fault-injection review are complete. Propagation metrics and
+comparison code still need their own review; no live fault experiments have run. See
 [Phase 1 progress](docs/phase1-progress.md) for completed work and the next step.
 
 ## Setup (bash/macOS/Linux)
@@ -149,6 +149,20 @@ python -m pytest -q
 
 They execute all 30 fulfillment cases and verify the workflow, mutable state, deterministic
 checker, source/dependency tracking, and that every source ID resolves in the same trace.
+
+## Offline fault-injection review
+
+```bash
+python -m experiments.review_faults \
+  --output-dir results/fulfillment/fault_review_new \
+  --baseline-dir results/fulfillment/clean_baseline_step2
+```
+
+This command blocks network connections and uses no API credentials or credits. It checks
+10 fault schedules, paired clean controls, timestamp-only and total-only diagnostic cases,
+and exact-request replay of all 30 saved baseline traces. It preserves source hashes,
+traces, and a report in the new output directory. Scripted results establish harness
+behavior, not live-model robustness; prompt-injection evidence is limited to delivery.
 
 ## Current deterministic tools 
 

@@ -8,6 +8,10 @@ from typing import Any
 from uuid import uuid4
 
 
+def read_trace(path: str | Path) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in Path(path).read_text().splitlines() if line.strip()]
+
+
 class TraceLogger:
     """Append-only JSONL trace for one workflow run."""
 

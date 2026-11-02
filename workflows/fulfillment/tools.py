@@ -4,6 +4,10 @@ from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Any
 import time
+import json
+
+from core.budget import RunBudget
+from .faults import FaultInjector
 
 from core.trace import TraceLogger
 
@@ -33,10 +37,16 @@ class FulfillmentTools:
         dataset: FulfillmentDataset,
         state: FulfillmentState,
         logger: TraceLogger,
+        injector: FaultInjector | None = None,
+        budget: RunBudget | None = None,
     ) -> None:
         self.dataset = dataset
         self.state = state
         self.logger = logger
+        self.injector = injector or FaultInjector(None)
+        self.budget = budget or RunBudget()
+        self.last_write_event_id: str | None = None
+        self.action_started = 0.0
 
     # Read-only tools -------------------------------------------------------
 
@@ -47,10 +57,9 @@ class FulfillmentTools:
             "order": order.model_dump(mode="json"),
             "items": [item.model_dump(mode="json") for item in items],
         }
-        event_id = self._log_read(
+        return self._log_read(
             "get_order_context", {"order_id": order_id}, result
         )
-        return result, event_id
 
     def get_inventory_inputs(self, order_id: str) -> tuple[dict[str, Any], str]:
         items = self.dataset.get_order_items(order_id)
@@ -69,10 +78,9 @@ class FulfillmentTools:
             )
 
         result = {"order_id": order_id, "items": rows}
-        event_id = self._log_read(
+        return self._log_read(
             "get_inventory_inputs", {"order_id": order_id}, result
         )
-        return result, event_id
 
     def get_pricing_inputs(self, order_id: str) -> tuple[dict[str, Any], str]:
         items = self.dataset.get_order_items(order_id)
@@ -87,10 +95,9 @@ class FulfillmentTools:
                 for item in items
             ],
         }
-        event_id = self._log_read(
+        return self._log_read(
             "get_pricing_inputs", {"order_id": order_id}, result
         )
-        return result, event_id
 
     def get_shipping_inputs(self, order_id: str) -> tuple[dict[str, Any], str]:
         order = self.dataset.get_order(order_id)
@@ -118,10 +125,9 @@ class FulfillmentTools:
             "items": lines,
             "rate": rate.model_dump(mode="json"),
         }
-        event_id = self._log_read(
+        return self._log_read(
             "get_shipping_inputs", {"order_id": order_id}, result
         )
-        return result, event_id
 
     # State-changing tools -------------------------------------------------
 
@@ -133,10 +139,15 @@ class FulfillmentTools:
     ) -> dict[str, Any]:
         before = self.state.snapshot()
         started = time.perf_counter()
-        self.logger.log("tool_started", stage=action.tool,
+        self.action_started = started
+        self.budget.tool()
+        start_id = self.logger.log("tool_started", stage=action.tool,
                         data={"arguments": action.model_dump(mode="json"), "mutates_state": True},
                         parent_ids=[triggered_by_artifact_id])
+        was_applied = self.injector.applied
         try:
+            self.injector.apply(action.model_dump(mode='json'), stage=action.tool,
+                                surface='tool_call', logger=self.logger, parent_id=start_id)
             return self._execute_action(action, triggered_by_artifact_id=triggered_by_artifact_id)
         except Exception as exc:
             self.logger.log(
@@ -146,7 +157,8 @@ class FulfillmentTools:
                       "latency_ms": (time.perf_counter() - started) * 1000,
                       "mutates_state": True, "before_state": before,
                       "after_state": self.state.snapshot()},
-                parent_ids=[triggered_by_artifact_id],
+                parent_ids=[triggered_by_artifact_id, start_id] +
+                           ([self.injector.event_id] if not was_applied and self.injector.applied else []),
             )
             raise
 
@@ -192,6 +204,8 @@ class FulfillmentTools:
                     f"requested={item.quantity}, available={row['available_qty']}"
                 )
 
+        if len({item.product_id for item in action.items}) != len(action.items):
+            raise ValueError('Duplicate products in one reservation are not allowed.')
         reservation_rows = []
         for item in action.items:
             row = self.state.inventory[item.product_id]
@@ -277,8 +291,29 @@ class FulfillmentTools:
         tool_name: str,
         arguments: dict[str, Any],
         result: dict[str, Any],
-    ) -> str:
-        return self.logger.log(
+    ) -> tuple[dict[str, Any], str]:
+        self.budget.tool()
+        started = time.perf_counter()
+        start_id = self.logger.log('tool_started', stage=tool_name,
+                                   data={'tool': tool_name, 'arguments': arguments, 'mutates_state': False})
+        stage = {'get_inventory_inputs': 'inventory_agent', 'get_pricing_inputs': 'pricing_agent',
+                 'get_shipping_inputs': 'shipping_agent'}.get(tool_name, tool_name)
+        was_applied = self.injector.applied
+        try:
+            result = self.injector.apply(result, stage=stage, surface='tool_response',
+                                         logger=self.logger, parent_id=start_id)
+            if isinstance(result, str):
+                result = json.loads(result)
+            if not isinstance(result, dict):
+                raise ValueError('Tool response must be a JSON object')
+        except Exception as exc:
+            self.logger.log('tool_failed', stage=tool_name,
+                            data={'tool': tool_name, 'arguments': arguments, 'error': str(exc),
+                                  'error_type': type(exc).__name__, 'mutates_state': False,
+                                  'latency_ms': (time.perf_counter() - started) * 1000},
+                            parent_ids=[start_id] + ([self.injector.event_id] if not was_applied and self.injector.applied else []))
+            raise
+        event_id = self.logger.log(
             "tool_completed",
             stage=tool_name,
             data={
@@ -286,8 +321,11 @@ class FulfillmentTools:
                 "arguments": arguments,
                 "result": result,
                 "mutates_state": False,
+                "latency_ms": (time.perf_counter() - started) * 1000,
             },
+            parent_ids=[start_id] + ([self.injector.event_id] if not was_applied and self.injector.applied else []),
         )
+        return result, event_id
 
     def _log_write(
         self,
@@ -297,7 +335,7 @@ class FulfillmentTools:
         before: dict[str, Any],
         triggered_by_artifact_id: str,
     ) -> None:
-        self.logger.log(
+        event_id = self.logger.log(
             "tool_completed",
             stage=tool_name,
             data={
@@ -308,9 +346,11 @@ class FulfillmentTools:
                 "before_state": before,
                 "after_state": self.state.snapshot(),
                 "triggered_by_artifact_id": triggered_by_artifact_id,
+                "latency_ms": (time.perf_counter() - self.action_started) * 1000,
             },
-            parent_ids=[triggered_by_artifact_id],
+            parent_ids=[triggered_by_artifact_id] + ([self.last_write_event_id] if self.last_write_event_id else []),
         )
+        self.last_write_event_id = event_id
 
     def _log_duplicate(
         self,

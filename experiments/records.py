@@ -8,6 +8,7 @@ import importlib.metadata
 import json
 from pathlib import Path
 import platform
+import shutil
 from typing import Any
 from uuid import uuid4
 
@@ -24,6 +25,20 @@ def write_json(path: Path, value: Any) -> None:
 def experiment_directory(kind: str) -> Path:
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     return Path('results/fulfillment') / f'{kind}_{stamp}_{uuid4().hex[:8]}'
+
+
+def save_source(destination: Path) -> None:
+    """Save only the code/data files declared by this experiment's manifest."""
+    root = Path(__file__).resolve().parents[1]
+    metadata = json.loads((destination / 'manifest.json').read_text())
+    files = {**metadata['code_sha256'], 'data/dataset.json': metadata['dataset_sha256']}
+    for relative, expected_hash in files.items():
+        source = root / relative
+        if hashlib.sha256(source.read_bytes()).hexdigest() != expected_hash:
+            raise RuntimeError(f'Source changed during the run: {relative}')
+        target = destination / 'source' / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
 
 
 def manifest(settings: Settings, *, cases: list[str], repetitions: int,

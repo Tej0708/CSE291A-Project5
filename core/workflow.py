@@ -30,6 +30,7 @@ class WorkflowResult:
     final_state: dict[str, Any] | None = None
     task_check: CheckResult | None = None
     stage_checks: dict[str, CheckResult] = field(default_factory=dict)
+    fault_applied: bool = False
 
 
 class Workflow(ABC):
