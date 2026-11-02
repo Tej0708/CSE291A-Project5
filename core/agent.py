@@ -41,7 +41,7 @@ class StructuredAgent:
         source_refs = sources or []
         source_ids = [source.source_id for source in source_refs]
 
-        logger.log(
+        call_id = logger.log(
             "agent_started",
             stage=self.name,
             data={"input": payload, "system_prompt": self.system_prompt,
@@ -61,6 +61,7 @@ class StructuredAgent:
                 "agent_failed" if getattr(exc, "api_call_attempted", True) else "agent_blocked",
                 stage=self.name,
                 data={
+                    "model_call_id": call_id,
                     "error": str(exc),
                     "error_type": getattr(exc, "error_type", type(exc).__name__),
                     "latency_ms": getattr(exc, "latency_ms", (time.perf_counter() - started) * 1000),
@@ -68,7 +69,7 @@ class StructuredAgent:
                     "model_name": getattr(exc, "model_name", None),
                     "usage": asdict(exc.usage if isinstance(exc, ModelCallError) else ModelUsage()),
                 },
-                parent_ids=source_ids,
+                parent_ids=source_ids + [call_id],
             )
             raise
 
@@ -84,6 +85,7 @@ class StructuredAgent:
             "agent_completed",
             stage=self.name,
             data={
+                "model_call_id": call_id,
                 "artifact": artifact.model_dump(mode="json"),
                 "raw_model_output": result.raw_text,
                 "model_name": result.model_name,
@@ -94,7 +96,7 @@ class StructuredAgent:
                     "total_tokens": result.usage.total_tokens,
                 },
             },
-            parent_ids=source_ids,
+            parent_ids=source_ids + [call_id],
         )
 
         return artifact

@@ -47,6 +47,8 @@ class FulfillmentTools:
         self.budget = budget or RunBudget()
         self.last_write_event_id: str | None = None
         self.action_started = 0.0
+        self.action_call_id: str | None = None
+        self.action_audit_id: str | None = None
 
     # Read-only tools -------------------------------------------------------
 
@@ -136,14 +138,18 @@ class FulfillmentTools:
         action: ToolAction,
         *,
         triggered_by_artifact_id: str,
+        audit_event_id: str | None = None,
     ) -> dict[str, Any]:
         before = self.state.snapshot()
         started = time.perf_counter()
         self.action_started = started
+        self.action_audit_id = audit_event_id
         self.budget.tool()
         start_id = self.logger.log("tool_started", stage=action.tool,
-                        data={"arguments": action.model_dump(mode="json"), "mutates_state": True},
-                        parent_ids=[triggered_by_artifact_id])
+                        data={"arguments": action.model_dump(mode="json"), "mutates_state": True,
+                              "audit_event_id": audit_event_id},
+                        parent_ids=[triggered_by_artifact_id] + ([audit_event_id] if audit_event_id else []))
+        self.action_call_id = start_id
         was_applied = self.injector.applied
         try:
             self.injector.apply(action.model_dump(mode='json'), stage=action.tool,
@@ -154,13 +160,18 @@ class FulfillmentTools:
                 "tool_failed", stage=action.tool,
                 data={"tool": action.tool, "arguments": action.model_dump(mode="json"),
                       "error": str(exc), "error_type": type(exc).__name__,
+                      "tool_call_id": start_id, "audit_event_id": audit_event_id,
                       "latency_ms": (time.perf_counter() - started) * 1000,
                       "mutates_state": True, "before_state": before,
                       "after_state": self.state.snapshot()},
                 parent_ids=[triggered_by_artifact_id, start_id] +
+                           ([audit_event_id] if audit_event_id else []) +
                            ([self.injector.event_id] if not was_applied and self.injector.applied else []),
             )
             raise
+        finally:
+            self.action_call_id = self.action_audit_id = None
+            self.action_started = 0.0
 
     def _execute_action(
         self, action: ToolAction, *, triggered_by_artifact_id: str,
@@ -309,6 +320,7 @@ class FulfillmentTools:
         except Exception as exc:
             self.logger.log('tool_failed', stage=tool_name,
                             data={'tool': tool_name, 'arguments': arguments, 'error': str(exc),
+                                  'tool_call_id': start_id,
                                   'error_type': type(exc).__name__, 'mutates_state': False,
                                   'latency_ms': (time.perf_counter() - started) * 1000},
                             parent_ids=[start_id] + ([self.injector.event_id] if not was_applied and self.injector.applied else []))
@@ -318,6 +330,7 @@ class FulfillmentTools:
             stage=tool_name,
             data={
                 "tool": tool_name,
+                "tool_call_id": start_id,
                 "arguments": arguments,
                 "result": result,
                 "mutates_state": False,
@@ -346,9 +359,12 @@ class FulfillmentTools:
                 "before_state": before,
                 "after_state": self.state.snapshot(),
                 "triggered_by_artifact_id": triggered_by_artifact_id,
-                "latency_ms": (time.perf_counter() - self.action_started) * 1000,
+                "tool_call_id": self.action_call_id, "audit_event_id": self.action_audit_id,
+                "latency_ms": ((time.perf_counter() - self.action_started) * 1000
+                               if self.action_started else None),
             },
-            parent_ids=[triggered_by_artifact_id] + ([self.last_write_event_id] if self.last_write_event_id else []),
+            parent_ids=[triggered_by_artifact_id] + [value for value in
+                        (self.action_call_id, self.action_audit_id, self.last_write_event_id) if value],
         )
         self.last_write_event_id = event_id
 
@@ -365,7 +381,12 @@ class FulfillmentTools:
                 "tool": tool_name,
                 "result": result,
                 "triggered_by_artifact_id": triggered_by_artifact_id,
+                "tool_call_id": self.action_call_id, "audit_event_id": self.action_audit_id,
+                "mutates_state": False,
+                "latency_ms": ((time.perf_counter() - self.action_started) * 1000
+                               if self.action_started else None),
             },
-            parent_ids=[triggered_by_artifact_id],
+            parent_ids=[triggered_by_artifact_id] + [value for value in
+                        (self.action_call_id, self.action_audit_id) if value],
         )
         return result

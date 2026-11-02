@@ -80,11 +80,12 @@ class FulfillmentWorkflow(Workflow):
             for index, action in enumerate(execution.actions):
                 policy_errors = (differences(action.model_dump(mode='json'), expected_actions[index])
                                  if index < len(expected_actions) else ['Unexpected extra action'])
-                logger.log('action_audited', stage=action.tool,
+                audit_id = logger.log('action_audited', stage=action.tool,
                            data={'authorized': not policy_errors, 'errors': policy_errors,
                                  'action': action.model_dump(mode='json'), 'attempt': 1},
                            parent_ids=[executor.artifact_id])
-                tools.execute_action(action, triggered_by_artifact_id=executor.artifact_id)
+                tools.execute_action(action, triggered_by_artifact_id=executor.artifact_id,
+                                     audit_event_id=audit_id)
         except Exception as exc:
             run_status = 'error'
             error, error_type = str(exc), getattr(exc, 'error_type', type(exc).__name__)

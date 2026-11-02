@@ -1,8 +1,8 @@
 # CSE 291A Multi-Agent Failure Recovery 
 
 This branch implements the order-fulfillment workflow and Phase 1 experiment tooling.
-The clean baseline and offline fault-injection review are complete. Propagation metrics and
-comparison code still need their own review; no live fault experiments have run. See
+The clean baseline, offline fault-injection review, and offline metric validation are
+complete. Comparison runners and the bounded live fault pilot remain pending. See
 [Phase 1 progress](docs/phase1-progress.md) for completed work and the next step.
 
 ## Setup (bash/macOS/Linux)
@@ -163,6 +163,19 @@ This command blocks network connections and uses no API credentials or credits. 
 and exact-request replay of all 30 saved baseline traces. It preserves source hashes,
 traces, and a report in the new output directory. Scripted results establish harness
 behavior, not live-model robustness; prompt-injection evidence is limited to delivery.
+
+## Offline metric review
+
+```bash
+python -m experiments.review_metrics \
+  --output-dir results/fulfillment/metric_review_new
+```
+
+This command blocks network connections. It reconciles 30 saved baseline traces, checks
+the expected metrics for 10 saved fault traces, verifies independent accounting fixtures,
+and replays all 30 saved baseline responses. See [metric definitions](docs/phase1-metrics.md).
+Unknown usage, missing action evidence, and incomplete calls stay explicit. The scripted
+fault results validate measurement behavior; they are not live-model failure rates.
 
 ## Current deterministic tools 
 

@@ -1,8 +1,8 @@
 # Phase 1 progress: first inventory workflow
 
 Working branch: `fulfillment-steps`, based on `order-fulfillment-nk`.
-Scope: Idea 2, first workflow (order fulfillment). Completed steps have separate local
-commits. Later-step prototypes remain uncommitted. Nothing has been pushed.
+Scope: Idea 2, first workflow (order fulfillment). Completed steps have separate commits.
+Steps 1–3 are pushed; Step 4 is a local commit. Later-step prototypes remain uncommitted.
 
 Work proceeds one recommended step at a time. Stop at each checkpoint and report changes,
 API usage, findings, and the next step. Use `api-glm-5.3-flash`, one pilot repetition, and
@@ -79,6 +79,34 @@ preserve the $50-per-key budget. Offline tests use fake models and spend no API 
   [per-fault evidence and baseline replay](../results/fulfillment/fault_review_step3/summary.json),
   [reproducible offline runner](../experiments/review_faults.py).
 
+## Step 4: propagation, policy, and resource metrics — complete offline
+
+- Added explicit model-call, tool-call, and policy-audit links. Interleaved completions now
+  use their own authorization decisions. Partial state changes before a failed call count;
+  idempotent duplicates without another state change do not.
+- Kept dependency exposure separate from observed incorrect outputs. Invalid graphs fail
+  validation instead of appearing to show zero propagation. Early tool interruptions remain
+  distinct from downstream semantic errors.
+- Corrected wasted-work accounting for final failed/rejected calls without a successful
+  retry. Distinct recomputed stages and extra model calls are measured separately; blocked
+  starts do not add model calls. Incomplete starts remain explicit.
+- Repair time includes failed retries and uses interval unions to avoid double-counting
+  overlapping repairs. Missing token fields, latency, and policy evidence remain unknown.
+- Fault-rate denominators require activation and a passing paired clean task/artifact
+  control. Accidental/adversarial groups remain separate. Excluded conditions and provider
+  errors still contribute to resource accounting.
+- Reconciled all 30 saved baseline traces and matched the expected metrics for all 10 saved
+  fault traces. Independent accounting fixtures cover interleaving, partial failures,
+  duplicate actions, unknown usage, failed retries, and restart costs. All 30 baseline
+  responses replayed with 150 exact prompt/input/schema matches.
+- Validation: 55 tests for the standalone Step 4 commit; 60 for the full working tree,
+  including uncommitted comparison prototypes. No model prompts, schemas, or dataset changed.
+- API usage: **0 requests, 0 tokens, $0**. Last confirmed key spending remains $0.03098815
+  of $50; no fresh balance query or live experiment was made.
+- [Metric definitions](phase1-metrics.md),
+  [saved review](../results/fulfillment/metric_review_step4/analysis.md),
+  [per-trace and fixture checks](../results/fulfillment/metric_review_step4/summary.json).
+
 ## Usage ledger through this checkpoint
 
 The Git split preserves the exact historical experiment snapshots. Those archives include
@@ -91,24 +119,23 @@ step is independently runnable. See [commit validation](commit-checkpoints.md).
 | Earlier development pilot | 110 | 64,925 | $0.01224510 |
 | Step 2 baseline | 150 | 99,707 | $0.01874305 |
 | Step 3 offline review | 0 | 0 | $0 |
+| Step 4 offline metric review | 0 | 0 | $0 |
 | Total | 260 | 164,632 | $0.03098815 |
 
 The earlier pilot's 10 rate-limited requests have unknown token usage; the cumulative token
 count is the reported lower bound. Provider spending is authoritative and agrees with the
 reported-token cost total at the follow-up snapshot (2026-11-02 06:25:05 UTC).
 
-Stopped after Step 3. Next checkpoint is offline validation of propagation, unauthorized
-action, and wasted-work metrics. No live experiment is needed for that review.
+Stopped after Step 4. Next: finish the comparison runners and run the agreed bounded live
+pilot with one repetition and explicit spending/call limits. No Step 5 experiment has begun.
 
 ## Remaining checkpoints
 
-4. Validate propagation and policy-violation metrics, including affected stages, unauthorized
-   actions, wasted work, and end-to-end performance; keep accidental/adversarial results separate.
 5. Run the agreed small fault pilot and comparisons against full restart and always verify,
    with explicit usage bounds. Determine whether further repetitions are justified.
 6. Produce the final Phase 1 results/report and reproducibility package; document limitations.
 
-Code for metrics and comparison checkpoints was already prepared before the one-step
-checkpoint preference was clarified. Its fake-model tests passing does not mean those
-checkpoints or their live experiments are complete. No live fault matrix has run.
+Comparison code was prepared before the one-step checkpoint preference was clarified.
+Its fake-model tests passing does not mean the comparison checkpoint or its live experiments
+are complete. No live fault matrix has run.
 Selective recovery belongs to Phase 2.
