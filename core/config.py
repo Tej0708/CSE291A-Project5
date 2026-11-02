@@ -13,6 +13,14 @@ class Settings:
     model_name: str
     log_dir: str = "logs"
     request_timeout_s: float = 60.0
+    min_request_interval_s: float = 1.0
+    max_completion_tokens: int = 1024
+
+    def __post_init__(self):
+        if self.request_timeout_s <= 0 or self.min_request_interval_s < 0:
+            raise ValueError('Request timeout must be positive and pacing must be nonnegative')
+        if self.max_completion_tokens < 1:
+            raise ValueError('Completion-token limit must be positive')
 
 
 def load_settings() -> Settings:
@@ -36,4 +44,6 @@ def load_settings() -> Settings:
         model_name=model_name,
         log_dir=log_dir,
         request_timeout_s=float(os.getenv("REQUEST_TIMEOUT_S", "60")),
+        min_request_interval_s=float(os.getenv("MIN_REQUEST_INTERVAL_S", "1")),
+        max_completion_tokens=int(os.getenv("MAX_COMPLETION_TOKENS", "1024")),
     )

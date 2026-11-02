@@ -11,6 +11,23 @@ from .config import Settings
 
 T = TypeVar("T", bound=BaseModel)
 
+INFRASTRUCTURE_ERRORS = {'AuthenticationError', 'PermissionDeniedError', 'RateLimitError',
+                         'APIConnectionError', 'APITimeoutError', 'InternalServerError'}
+
+
+def request_messages(system_prompt, payload, output_schema):
+    """One serialization shared by the client and conservative spend guard."""
+    return [
+        {"role": "system", "content": (
+            f"{system_prompt}\n\n"
+            "Return only one valid JSON object matching the provided schema. "
+            "Do not include Markdown fences or extra commentary."
+        )},
+        {"role": "user", "content": json.dumps({
+            "input": payload, "required_output_schema": output_schema.model_json_schema(),
+        })},
+    ]
+
 
 @dataclass(frozen=True)
 class ModelUsage:
@@ -65,6 +82,9 @@ class TritonModelClient:
             ) from exc
 
         self._model_name = settings.model_name
+        self._min_interval = settings.min_request_interval_s
+        self._last_request = 0.0
+        self._max_completion_tokens = settings.max_completion_tokens
         self._client = OpenAI(
             api_key=settings.api_key,
             base_url=settings.base_url,
@@ -79,31 +99,17 @@ class TritonModelClient:
         payload: dict[str, Any],
         output_schema: type[T],
     ) -> ModelResult:
-        schema = output_schema.model_json_schema()
-        user_content = {
-            "input": payload,
-            "required_output_schema": schema,
-        }
-
+        delay = getattr(self, '_min_interval', 0) - (time.perf_counter() - getattr(self, '_last_request', 0))
+        if delay > 0:
+            time.sleep(delay)
         started = time.perf_counter()
+        self._last_request = started
         try:
             response = self._client.chat.completions.create(
-            model=self._model_name,
-            temperature=0,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        f"{system_prompt}\n\n"
-                        "Return only one valid JSON object matching the provided schema. "
-                        "Do not include Markdown fences or extra commentary."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": json.dumps(user_content),
-                },
-            ],
+                model=self._model_name,
+                temperature=0,
+                max_completion_tokens=getattr(self, '_max_completion_tokens', 1024),
+                messages=request_messages(system_prompt, payload, output_schema),
             )
         except Exception as exc:
             # Provider exceptions may contain endpoint details; log the type only.
@@ -114,7 +120,7 @@ class TritonModelClient:
             ) from exc
         latency_ms = (time.perf_counter() - started) * 1000
 
-        raw_text = response.choices[0].message.content or ""
+        raw_text = None
         usage = getattr(response, "usage", None)
         model_usage = ModelUsage(
             input_tokens=getattr(usage, "prompt_tokens", None),
@@ -122,6 +128,7 @@ class TritonModelClient:
             total_tokens=getattr(usage, "total_tokens", None),
         )
         try:
+            raw_text = response.choices[0].message.content or ""
             parsed = self._parse_json(raw_text)
             value = output_schema.model_validate(parsed)
         except Exception as exc:
@@ -135,7 +142,7 @@ class TritonModelClient:
             raw_text=raw_text,
             usage=model_usage,
             latency_ms=latency_ms,
-            model_name=self._model_name,
+            model_name=getattr(response, 'model', None) or self._model_name,
         )
 
     @staticmethod

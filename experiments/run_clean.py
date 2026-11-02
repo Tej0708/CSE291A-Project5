@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from core.config import Settings
-from core.model_client import TritonModelClient
+from core.model_client import INFRASTRUCTURE_ERRORS, TritonModelClient
 from workflows.registry import build_workflow
 
 from .metrics import RunMetrics, summarize_trace
@@ -24,6 +24,7 @@ class CleanRunSummary:
     metrics: RunMetrics
     run_status: str = "completed"
     failed_stage: str | None = None
+    task_passed: bool | None = None
 
 
 def run_clean_workflow(
@@ -34,6 +35,8 @@ def run_clean_workflow(
     repetitions: int = 1,
     output_dir: str | Path | None = None,
     progress: bool = False,
+    model_client=None,
+    budget_metadata: dict | None = None,
 ) -> list[CleanRunSummary]:
     if repetitions < 1:
         raise ValueError("repetitions must be at least 1")
@@ -41,7 +44,7 @@ def run_clean_workflow(
     if destination is not None:
         destination.mkdir(parents=True, exist_ok=False)
         settings = replace(settings, log_dir=str(destination / 'traces'))
-    model_client = TritonModelClient(settings)
+    model_client = model_client if model_client is not None else TritonModelClient(settings)
     workflow = build_workflow(
         workflow_name,
         model_client=model_client,
@@ -53,9 +56,12 @@ def run_clean_workflow(
     if unknown:
         raise ValueError(f"Unknown task IDs: {sorted(unknown)}")
     if destination is not None:
-        write_json(destination / 'manifest.json', manifest(
+        metadata = manifest(
             settings, cases=selected_tasks, repetitions=repetitions, condition='clean',
-        ))
+        )
+        if budget_metadata is not None:
+            metadata['api_budget'] = budget_metadata
+        write_json(destination / 'manifest.json', metadata)
     summaries: list[CleanRunSummary] = []
 
     for task_id in selected_tasks:
@@ -73,15 +79,23 @@ def run_clean_workflow(
                     metrics=summarize_trace(result.log_path),
                     run_status=result.run_status,
                     failed_stage=result.failed_stage,
+                    task_passed=result.task_check.passed if result.task_check else None,
                 )
             )
             if destination is not None:
                 with (destination / 'runs.jsonl').open('a', encoding='utf-8') as handle:
                     handle.write(json.dumps(asdict(summaries[-1])) + '\n')
-                write_json(destination / 'summary.json', clean_summary(summaries))
+                summary_data = clean_summary(summaries)
+                if hasattr(model_client, 'budget_snapshot'):
+                    summary_data['api_budget'] = model_client.budget_snapshot()
+                write_json(destination / 'summary.json', summary_data)
             if progress:
                 summary = summaries[-1]
                 print(f"{task_id}: {summary.run_status} checker_pass={summary.passed} "
                       f"calls={summary.metrics.model_calls} tokens={summary.metrics.total_tokens}", flush=True)
+            if result.error_type in INFRASTRUCTURE_ERRORS | {
+                'InferenceBudgetExceeded', 'BadRequestError', 'NotFoundError', 'UnprocessableEntityError',
+            }:
+                return summaries
 
     return summaries

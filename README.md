@@ -1,8 +1,9 @@
 # CSE 291A Multi-Agent Failure Recovery 
 
-This repository currently implements the clean, pre-fault-injection foundation for the
-order-fulfillment workflow. The shared core is structured so a second workflow can be added
-without duplicating model, trace, or experiment code.
+This branch implements the order-fulfillment workflow and Phase 1 experiment tooling.
+The clean baseline is complete. Fault injection and comparison methods remain later
+checkpoints; no live fault experiments have run. See
+[Phase 1 progress](docs/phase1-progress.md) for completed work and the next step.
 
 ## Setup (bash/macOS/Linux)
 
@@ -33,6 +34,24 @@ immutable `data/dataset.json`, so one task/run cannot change the starting state 
 ## Running clean experiments
 
 These are purely for establishing baseline behavior that later fault-injection runs will be compared against.
+
+The recommended budgeted baseline command runs all 30 orders once, checks key spending,
+and stops before exceeding 150 API calls or its conservative $0.05 local estimate:
+
+```bash
+python -m experiments.clean_baseline \
+  --output-dir results/fulfillment/clean_baseline_step2 \
+  --max-api-calls 150 --max-cost-usd 0.05
+```
+
+Use a new output directory for each experiment. The runner saves provider spending before
+and after, public token prices, per-order results, source hashes, an executed-source snapshot,
+and full traces. Provider billing remains authoritative; unknown token usage retains a
+conservative cost reservation. The user's key budget is $50. The default model is
+`api-glm-5.3-flash`, with one-second request spacing, no SDK retries, and a 1,024-token
+completion cap. `MAX_COMPLETION_TOKENS` can override that cap.
+
+The general-purpose commands below do not apply the baseline runner's dollar/call limit.
 
 Run one fulfillment task:
 
@@ -147,9 +166,3 @@ State-changing tools used by the Executor:
 - `update_order_status`
 
 `dataset.json` is never mutated. Each run creates a new `FulfillmentState`.
-
-## Phase 1 checkpoints
-
-Step 1 records failed model/tool calls, unknown token usage, partial state, and terminal
-results. Batch runs preserve JSONL traces and reproducibility manifests. Model requests
-have a 60-second timeout and no automatic SDK retries. See [progress](docs/phase1-progress.md).

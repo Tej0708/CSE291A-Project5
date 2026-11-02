@@ -58,7 +58,7 @@ class StructuredAgent:
             )
         except Exception as exc:
             logger.log(
-                "agent_failed",
+                "agent_failed" if getattr(exc, "api_call_attempted", True) else "agent_blocked",
                 stage=self.name,
                 data={
                     "error": str(exc),

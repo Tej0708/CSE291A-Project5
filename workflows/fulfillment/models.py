@@ -56,6 +56,7 @@ class FulfillmentGroundTruth(BaseModel):
     expected_decision: Literal[
         "approve_fulfillment",
         "reject_insufficient_stock",
+        "reject_shipping_constraint",
     ]
     expected_subtotal_usd: float
     expected_shipping_usd: float | None = None
@@ -110,6 +111,7 @@ class FulfillmentPlan(BaseModel):
     decision: Literal[
         "approve_fulfillment",
         "reject_insufficient_stock",
+        "reject_shipping_constraint",
     ]
     reason: str
     subtotal_usd: float = Field(ge=0)
@@ -141,7 +143,7 @@ class CreateShipmentAction(BaseModel):
 
 class UpdateOrderStatusAction(BaseModel):
     tool: Literal["update_order_status"]
-    status: Literal["fulfilled", "rejected_insufficient_stock"]
+    status: Literal["fulfilled", "rejected_insufficient_stock", "rejected_shipping_constraint"]
 
 
 ToolAction = Annotated[

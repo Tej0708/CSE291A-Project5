@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import asdict
 from pathlib import Path
 
 from core.artifact import AgentArtifact, artifact_source, tool_event_source
@@ -10,7 +11,7 @@ from core.workflow import CheckResult, Workflow, WorkflowResult
 from data.loader import DEFAULT_DATASET_PATH
 
 from .agents import build_agents
-from .checker import check_fulfillment_run
+from .checker import assess_run
 from .dataset import FulfillmentDataset
 from .models import ExecutionDecision
 from .state import FulfillmentState
@@ -37,53 +38,37 @@ class FulfillmentWorkflow(Workflow):
     def run(self, task_id: str) -> WorkflowResult:
         state = FulfillmentState.from_dataset(self.dataset, task_id)
         initial_state = deepcopy(state)
-        logger = TraceLogger(
-            workflow=self.name,
-            task_id=task_id,
-            log_dir=self.log_dir,
-        )
-        tools = FulfillmentTools(
-            dataset=self.dataset,
-            state=state,
-            logger=logger,
-        )
-
-        logger.log(
-            "workflow_started",
-            data={"initial_state": state.snapshot()},
-        )
-
+        logger = TraceLogger(workflow=self.name, task_id=task_id, log_dir=self.log_dir)
+        tools = FulfillmentTools(dataset=self.dataset, state=state, logger=logger)
+        logger.log('workflow_started', data={'initial_state': state.snapshot()})
         artifacts: list[AgentArtifact] = []
         error = error_type = failed_stage = None
-        run_status = "completed"
+        run_status = 'completed'
         try:
             self._execute(task_id, tools, logger, artifacts)
-            check = check_fulfillment_run(
-                order_id=task_id, dataset=self.dataset, initial_state=initial_state,
-                final_state=state, inventory_artifact=artifacts[0],
-                pricing_artifact=artifacts[1], shipping_artifact=artifacts[2],
-                plan_artifact=artifacts[3], executor_artifact=artifacts[4],
-            )
         except Exception as exc:
-            run_status = "error"
-            error, error_type = str(exc), getattr(exc, "error_type", type(exc).__name__)
+            run_status = 'error'
+            error, error_type = str(exc), getattr(exc, 'error_type', type(exc).__name__)
             failed_stage = logger.last_stage
-            check = CheckResult(False, (f"{failed_stage}: {error}",))
-
-        logger.log(
-            "workflow_completed", data={
-                "outcome": state.order_status, "run_status": run_status,
-                "check_passed": check.passed, "check_errors": list(check.errors),
-                "failed_stage": failed_stage, "error_type": error_type, "error": error,
-                "final_state": state.snapshot(),
-            }, parent_ids=[a.artifact_id for a in artifacts[-1:]],
-        )
+        check, task_check, stage_checks = assess_run(
+            order_id=task_id, dataset=self.dataset, initial_state=initial_state,
+            final_state=state, artifacts=artifacts)
+        if error:
+            check = CheckResult(False, check.errors + (f'{failed_stage}: {error}',))
+        logger.log('workflow_completed', data={
+            'outcome': state.order_status, 'run_status': run_status,
+            'check_passed': check.passed, 'check_errors': list(check.errors),
+            'task_passed': task_check.passed, 'task_errors': list(task_check.errors),
+            'stage_checks': {name: asdict(value) for name, value in stage_checks.items()},
+            'failed_stage': failed_stage, 'error_type': error_type, 'error': error,
+            'final_state': state.snapshot(),
+        }, parent_ids=[artifact.artifact_id for artifact in artifacts])
         return WorkflowResult(
             workflow=self.name, task_id=task_id, run_id=logger.run_id,
             outcome=state.order_status, artifacts=tuple(artifacts), check=check,
             log_path=str(logger.path), run_status=run_status, failed_stage=failed_stage,
             error_type=error_type, error=error, initial_state=initial_state.snapshot(),
-            final_state=state.snapshot(),
+            final_state=state.snapshot(), task_check=task_check, stage_checks=stage_checks,
         )
 
     def _execute(self, task_id: str, tools: FulfillmentTools, logger: TraceLogger,

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
+from workflows.fulfillment.workflow import FulfillmentWorkflow
+
+import json
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Any
 
@@ -15,7 +17,6 @@ from workflows.fulfillment.models import (
     PricingResult,
     ShippingResult,
 )
-from workflows.fulfillment.workflow import FulfillmentWorkflow
 
 
 CENT = Decimal("0.01")
@@ -26,7 +27,7 @@ def money(value: Decimal) -> float:
 
 
 class FakeModelClient:
-    """Deterministic test double; no external API calls."""
+    """Offline rule-following stand-in. Does not interpret text instructions or call an API."""
 
     def generate(
         self,
@@ -126,11 +127,12 @@ class FakeModelClient:
         shipping = payload["shipping"]
         order = payload["order"]
 
-        if not inventory["all_items_available"]:
+        if not inventory["all_items_available"] or not shipping["within_weight_limit"]:
             return {
                 "order_id": order["order_id"],
-                "decision": "reject_insufficient_stock",
-                "reason": "One or more items have insufficient inventory.",
+                "decision": ("reject_insufficient_stock" if not inventory["all_items_available"]
+                             else "reject_shipping_constraint"),
+                "reason": "Inventory or shipping constraint failed.",
                 "subtotal_usd": pricing["subtotal_usd"],
                 "shipping_service": None,
                 "total_weight_kg": None,
@@ -156,12 +158,12 @@ class FakeModelClient:
     @staticmethod
     def _executor(payload: dict[str, Any]) -> dict[str, Any]:
         plan = payload["plan"]
-        if plan["decision"] == "reject_insufficient_stock":
+        if plan["decision"] != "approve_fulfillment":
             return {
                 "actions": [
                     {
                         "tool": "update_order_status",
-                        "status": "rejected_insufficient_stock",
+                        "status": plan["decision"].replace("reject_", "rejected_", 1),
                     }
                 ]
             }
@@ -191,7 +193,6 @@ class FakeModelClient:
                 },
             ]
         }
-
 
 def test_all_fulfillment_cases_pass_with_deterministic_model(tmp_path) -> None:
     workflow = FulfillmentWorkflow(

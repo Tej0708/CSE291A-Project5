@@ -44,4 +44,5 @@ class FulfillmentState:
             "inventory": deepcopy(self.inventory),
             "reservations": deepcopy(self.reservations),
             "shipments": deepcopy(self.shipments),
+            "idempotency_keys": sorted(self.idempotency_keys),
         }

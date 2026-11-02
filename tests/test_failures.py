@@ -86,6 +86,7 @@ def test_invalid_model_json_preserves_response_and_usage():
     )
     client = TritonModelClient.__new__(TritonModelClient)
     client._model_name = 'fake'
+    client._max_completion_tokens = 1024
     sent = {}
     def create(**kwargs):
         sent.update(kwargs)
@@ -96,3 +97,4 @@ def test_invalid_model_json_preserves_response_and_usage():
     assert error.value.raw_text == '{"broken":'
     assert error.value.usage.total_tokens == 24
     assert error.value.latency_ms >= 0
+    assert sent['max_completion_tokens'] == 1024

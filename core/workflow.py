@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from .artifact import AgentArtifact
@@ -28,6 +28,8 @@ class WorkflowResult:
     error: str | None = None
     initial_state: dict[str, Any] | None = None
     final_state: dict[str, Any] | None = None
+    task_check: CheckResult | None = None
+    stage_checks: dict[str, CheckResult] = field(default_factory=dict)
 
 
 class Workflow(ABC):

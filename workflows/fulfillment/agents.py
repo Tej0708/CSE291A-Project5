@@ -57,6 +57,8 @@ Rules:
    total_usd = subtotal_usd + shipping_usd, rounded to two decimals.
 3. Explain the decision briefly in reason.
 4. Do not change upstream values.
+5. If stock is sufficient but shipping exceeds its weight limit, use
+   reject_shipping_constraint, keep subtotal_usd, and set all shipment/total fields to null.
 """.strip()
 
 
@@ -72,6 +74,9 @@ For approve_fulfillment, output exactly these actions in this order:
 
 For reject_insufficient_stock, output exactly one action:
 1. update_order_status with status = rejected_insufficient_stock
+
+For reject_shipping_constraint, output exactly one action:
+1. update_order_status with status = rejected_shipping_constraint
 
 Use no other tool names. Do not modify quantities or monetary values.
 """.strip()
