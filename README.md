@@ -193,3 +193,41 @@ State-changing tools used by the Executor:
 - `update_order_status`
 
 `dataset.json` is never mutated. Each run creates a new `FulfillmentState`.
+
+## Recovery baselines (fulfillment)
+
+Use Python 3.10 or newer. Select a policy with `--mode full_restart` or
+`--mode always_verify` on `main.py`; the default remains `unprotected`.
+
+- `full_restart` detects exceptions, an incorrect final plan, or an incorrect simulated state using
+  authoritative business records, then permits one complete retry from fresh
+  dataset state. It does not use the final checker's gold-label verdict as a trigger.
+  Intermediate errors that leave a correct final plan and state do not trigger a restart.
+- `always_verify` independently checks every produced artifact after injection and
+  before downstream consumption, including executor actions before dispatch.
+  A rejected output or stage exception permits one fresh stage invocation and a
+  second verification. A second failure stops execution. Retries read inputs again
+  and regenerate outputs with the model; reference answers are never substituted.
+  State-changing tool failures stop the attempt rather than retrying partial effects.
+
+Both policies share one `RunBudget` across retries. Configuration, provider
+infrastructure, and budget errors are not retried. Faults are transient: an injected
+fault occurs once and is absent on a full restart. Resetting simulated state does
+not implement compensation for real external actions.
+
+`WorkflowResult.attempts` preserves each full attempt and its trace. Clean-run
+summaries include all attempt paths and sum their resource metrics. Verification
+records include elapsed time and rejected artifact dependencies; deterministic
+verification consumes a tool-budget unit and no model call.
+
+Run the offline comparison matrix (clean controls plus every default fault under
+all three modes) without API credits:
+
+```bash
+python -m experiments.compare_recovery --output-dir /tmp/recovery-review
+```
+
+The new directory contains `results.json` and all attempt traces, including
+propagation, discarded-call accounting, verification costs, and retry costs.
+Scripted outcomes validate the recovery harness; live-model experiments remain
+separate. Align detection and metric definitions with Workflow 2 before pooling results.

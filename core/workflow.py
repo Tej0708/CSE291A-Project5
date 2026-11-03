@@ -31,6 +31,8 @@ class WorkflowResult:
     task_check: CheckResult | None = None
     stage_checks: dict[str, CheckResult] = field(default_factory=dict)
     fault_applied: bool = False
+    recovery_detected: bool = False
+    attempts: tuple[WorkflowResult, ...] = ()
 
 
 class Workflow(ABC):

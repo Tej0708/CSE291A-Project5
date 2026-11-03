@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import asdict
+from dataclasses import asdict, replace
+import time
 
 from core.artifact import artifact_source, tool_event_source
 from core.budget import RunBudget
+from core.model_client import INFRASTRUCTURE_ERRORS
 from core.trace import TraceLogger
 from core.workflow import CheckResult, Workflow, WorkflowResult
 from data.loader import DEFAULT_DATASET_PATH
@@ -15,7 +17,8 @@ from .faults import FaultInjector, FaultSpec
 from .models import ExecutionDecision
 from .state import FulfillmentState
 from .tools import FulfillmentTools
-from .validation import differences, reference_artifacts
+from .validation import differences, reference_artifacts, final_state_errors
+from .verifier import VerificationError, verify_artifact
 
 
 class FulfillmentWorkflow(Workflow):
@@ -31,8 +34,28 @@ class FulfillmentWorkflow(Workflow):
 
     def run(self, task_id: str, *, fault: FaultSpec | None = None,
             mode: str = 'unprotected', budget: RunBudget | None = None) -> WorkflowResult:
-        if mode != 'unprotected':
+        if mode not in ('unprotected', 'full_restart', 'always_verify'):
             raise ValueError(f'Unknown execution mode: {mode}')
+        budget = budget or RunBudget()
+        first = self._run_attempt(task_id, fault=fault, mode=mode, budget=budget)
+        attempts = [first]
+        if mode == 'full_restart' and first.recovery_detected and self._retryable(first.error_type):
+            second = self._run_attempt(task_id, fault=None, mode=mode, budget=budget)
+            attempts.append(second)
+        return replace(attempts[-1], attempts=tuple(attempts),
+                       fault_applied=any(item.fault_applied for item in attempts))
+
+    @staticmethod
+    def _retryable(error_type):
+        return error_type not in INFRASTRUCTURE_ERRORS | {
+            'BudgetExceeded', 'InferenceBudgetExceeded', 'FaultConfigurationError',
+            'BadRequestError', 'NotFoundError', 'UnprocessableEntityError',
+            # Programming defects must remain visible rather than consume retries.
+            'TypeError', 'AttributeError', 'KeyError', 'IndexError',
+            'NameError', 'AssertionError', 'NotImplementedError',
+        }
+
+    def _run_attempt(self, task_id, *, fault, mode, budget):
         if fault is not None and fault.case_id != task_id:
             raise ValueError('Fault schedule does not match the selected case')
         state = FulfillmentState.from_dataset(self.dataset, task_id)
@@ -50,31 +73,74 @@ class FulfillmentWorkflow(Workflow):
         run_status = 'completed'
 
         def stage(agent, factory):
-            logger.log('stage_started', stage=agent.name, data={'attempt': 1})
-            payload, sources = factory()
-            budget.model()
-            artifact = agent.run(payload=payload, logger=logger, sources=sources)
-            artifact = injector.artifact(artifact, logger)
-            artifacts.append(artifact)
-            return artifact
+            for attempt in range(1, 3 if mode == 'always_verify' else 2):
+                logger.log('stage_started', stage=agent.name, data={'attempt': attempt})
+                try:
+                    payload, sources = factory()
+                    budget.model()
+                    artifact = agent.run(payload=payload, logger=logger, sources=sources)
+                    artifact = injector.artifact(artifact, logger)
+                    if mode == 'always_verify':
+                        budget.tool()
+                        verdict = verify_artifact(self.dataset, initial, task_id, artifact, logger)
+                        if not verdict:
+                            raise VerificationError('Artifact differs from authoritative records')
+                    if attempt > 1:
+                        logger.log('stage_repaired', stage=agent.name,
+                                   parent_ids=[artifact.artifact_id])
+                    artifacts.append(artifact)
+                    return artifact
+                except Exception as exc:
+                    if (mode != 'always_verify' or attempt == 2
+                            or not self._retryable(getattr(exc, 'error_type', type(exc).__name__))):
+                        raise
+                    logger.log('stage_retry', stage=agent.name,
+                               data={'attempt': attempt + 1, 'error': str(exc)})
 
         def read_factory(tool):
             payload, event_id = getattr(tools, tool)(task_id)
             return payload, [tool_event_source(event_id)]
 
         try:
-            order_context, order_event_id = tools.get_order_context(task_id)
+            for context_attempt in range(2 if mode == 'always_verify' else 1):
+                try:
+                    order_context, order_event_id = tools.get_order_context(task_id)
+                    if context_attempt:
+                        logger.log('tool_repaired', stage='get_order_context')
+                    break
+                except Exception as exc:
+                    if context_attempt or mode != 'always_verify' or not self._retryable(
+                            getattr(exc, 'error_type', type(exc).__name__)):
+                        raise
+                    logger.log('tool_retry', stage='get_order_context', data={'error': str(exc)})
             inventory = stage(self.agents.inventory, lambda: read_factory('get_inventory_inputs'))
             pricing = stage(self.agents.pricing, lambda: read_factory('get_pricing_inputs'))
             shipping = stage(self.agents.shipping, lambda: read_factory('get_shipping_inputs'))
-            plan = stage(self.agents.planner, lambda: (
-                {'order': order_context['order'], 'inventory': inventory.value,
-                 'pricing': pricing.value, 'shipping': shipping.value},
-                [tool_event_source(order_event_id), artifact_source(inventory),
-                 artifact_source(pricing), artifact_source(shipping)]))
-            executor = stage(self.agents.executor, lambda: (
-                {'order': order_context, 'plan': plan.value},
-                [tool_event_source(order_event_id), artifact_source(plan)]))
+            plan_reads = 0
+
+            def plan_factory():
+                nonlocal order_context, order_event_id, plan_reads
+                if plan_reads:
+                    order_context, order_event_id = tools.get_order_context(task_id)
+                plan_reads += 1
+                context, context_sources = order_context, [tool_event_source(order_event_id)]
+                return (
+                    {'order': context['order'], 'inventory': inventory.value,
+                     'pricing': pricing.value, 'shipping': shipping.value},
+                    context_sources + [artifact_source(inventory),
+                                       artifact_source(pricing), artifact_source(shipping)])
+            plan = stage(self.agents.planner, plan_factory)
+            executor_reads = 0
+
+            def executor_factory():
+                nonlocal order_context, order_event_id, executor_reads
+                if executor_reads:
+                    order_context, order_event_id = tools.get_order_context(task_id)
+                executor_reads += 1
+                return ({'order': order_context, 'plan': plan.value},
+                        [tool_event_source(order_event_id), artifact_source(plan)])
+
+            executor = stage(self.agents.executor, executor_factory)
             execution = ExecutionDecision.model_validate(executor.value)
             expected_actions = reference_artifacts(self.dataset, initial, task_id)['executor_agent']['actions']
             for index, action in enumerate(execution.actions):
@@ -90,6 +156,23 @@ class FulfillmentWorkflow(Workflow):
             run_status = 'error'
             error, error_type = str(exc), getattr(exc, 'error_type', type(exc).__name__)
             failed_stage = logger.last_stage
+
+        # Runtime detector uses business records and observed state, never gold labels.
+        recovery_detected = bool(error)
+        if mode == 'full_restart':
+            detection_started = time.perf_counter()
+            detection_errors = final_state_errors(self.dataset, initial, state, task_id)
+            # The simulated state does not store quoted totals; validate the final
+            # plan as well so incorrect billing decisions are observable.
+            expected_plan = reference_artifacts(self.dataset, initial, task_id)['planning_agent']
+            for artifact in artifacts:
+                if artifact.stage == 'planning_agent':
+                    detection_errors.extend(differences(artifact.value, expected_plan))
+            recovery_detected = bool(error or detection_errors)
+            logger.log('failure_detection_completed', data={
+                'detected': recovery_detected, 'errors': detection_errors,
+                'latency_ms': (time.perf_counter() - detection_started) * 1000,
+                'error_type': error_type, 'policy': 'exception_or_final_plan_and_state_validation'})
 
         check, task_check, stage_checks = assess_run(
             order_id=task_id, dataset=self.dataset, initial_state=initial,
@@ -111,4 +194,5 @@ class FulfillmentWorkflow(Workflow):
             error_type=error_type, error=error, initial_state=initial.snapshot(),
             final_state=state.snapshot(), task_check=task_check,
             stage_checks=stage_checks, fault_applied=injector.applied,
+            recovery_detected=recovery_detected,
         )

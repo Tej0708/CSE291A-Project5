@@ -35,6 +35,8 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help="Number of repetitions per selected task (default: 1).",
     )
+    parser.add_argument("--mode", choices=("unprotected", "full_restart", "always_verify"),
+                        default="unprotected")
     parser.add_argument("--output-dir", help="New directory for manifest, traces, and results.")
     return parser.parse_args()
 
@@ -52,6 +54,7 @@ def main() -> int:
         repetitions=args.runs,
         output_dir=args.output_dir or experiment_directory('clean'),
         progress=True,
+        mode=args.mode,
     )
 
     any_failed = False

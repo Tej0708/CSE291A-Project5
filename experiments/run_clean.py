@@ -24,6 +24,7 @@ class CleanRunSummary:
     metrics: RunMetrics
     run_status: str = "completed"
     failed_stage: str | None = None
+    attempt_log_paths: tuple[str, ...] = ()
     task_passed: bool | None = None
 
 
@@ -37,6 +38,7 @@ def run_clean_workflow(
     progress: bool = False,
     model_client=None,
     budget_metadata: dict | None = None,
+    mode: str = "unprotected",
 ) -> list[CleanRunSummary]:
     if repetitions < 1:
         raise ValueError("repetitions must be at least 1")
@@ -59,6 +61,7 @@ def run_clean_workflow(
         metadata = manifest(
             settings, cases=selected_tasks, repetitions=repetitions, condition='clean',
         )
+        metadata['mode'] = mode
         if budget_metadata is not None:
             metadata['api_budget'] = budget_metadata
         write_json(destination / 'manifest.json', metadata)
@@ -66,7 +69,14 @@ def run_clean_workflow(
 
     for task_id in selected_tasks:
         for _ in range(repetitions):
-            result = workflow.run(task_id)
+            result = workflow.run(task_id, mode=mode) if workflow_name == 'fulfillment' else workflow.run(task_id)
+            attempts = result.attempts or (result,)
+            measured = [asdict(summarize_trace(item.log_path)) for item in attempts]
+            combined = RunMetrics(**{
+                key: None if any(item[key] is None for item in measured)
+                else sum(item[key] for item in measured)
+                for key in measured[0]
+            })
             summaries.append(
                 CleanRunSummary(
                     workflow=result.workflow,
@@ -76,7 +86,8 @@ def run_clean_workflow(
                     outcome=result.outcome,
                     log_path=result.log_path,
                     errors=result.check.errors,
-                    metrics=summarize_trace(result.log_path),
+                    metrics=combined,
+                    attempt_log_paths=tuple(item.log_path for item in attempts),
                     run_status=result.run_status,
                     failed_stage=result.failed_stage,
                     task_passed=result.task_check.passed if result.task_check else None,
