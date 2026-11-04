@@ -1,10 +1,12 @@
 # CSE 291A Multi-Agent Failure Recovery 
 
-This branch implements the order-fulfillment workflow and Phase 1 experiment tooling.
-The clean baseline, offline fault-injection review, and offline metric validation are
-complete. Offline comparison and paired live experiment runners are available;
-the bounded live fault pilot remains pending. See
-[Phase 1 progress](docs/phase1-progress.md) for completed work and the next step.
+This branch implements the order-fulfillment workflow for studying fault propagation
+and recovery in a multi-agent system. It includes controlled fault injection,
+dependency and action tracing, full-restart and always-verify recovery baselines,
+held-out evaluation workloads, live experiment runners, and automated result analysis.
+
+The clean baseline, offline validation, live pilot, and three-repetition held-out
+baseline evaluation have been completed.
 
 ## Setup (bash/macOS/Linux)
 
@@ -32,9 +34,10 @@ same JSONL trace.
 Each task execution is one isolated **run**. A run creates fresh mutable state from the
 immutable `data/dataset.json`, so one task/run cannot change the starting state of another.
 
-## Running clean experiments
+## Clean baseline and basic runs
 
-These are purely for establishing baseline behavior that later fault-injection runs will be compared against.
+The clean baseline establishes fault-free behavior and resource usage for comparison
+with fault-injected and recovery runs.
 
 The recommended budgeted baseline command runs all 30 orders once, checks key spending,
 and stops before exceeding 150 API calls or its conservative $0.05 local estimate:
@@ -86,14 +89,6 @@ Repeat each selected task:
 python main.py --workflow fulfillment --task-id ORD-1001 --runs 5
 ```
 
-TODO:
-When the support workflow is added, it can be registered in `workflows/registry.py` and called
-through the same CLI, for example:
-
-```bash
-python main.py --workflow support --task-id TKT-2001
-```
-
 ## Paired live fault/recovery experiments
 
 A separate [Workflow 1 evaluation dataset](docs/fulfillment-evaluation.md) provides
@@ -109,43 +104,61 @@ python -m experiments.run_live_fault_recovery --scripted \
 The runner pairs clean and injected runs under `unprotected`, `full_restart`, and
 `always_verify`, saving trial metrics, comparisons, traces, and completion status.
 See [live experiment instructions](docs/live-fault-recovery.md) for budgeted live
-commands and interpretation limits. Live experiments have not been run.
+commands and interpretation limits. 
+
+Run the held-out evaluation with three repetitions:
+
+```bash
+python -m experiments.run_live_fault_recovery \
+  --dataset data/fulfillment_eval.json \
+  --faults-file data/fulfillment_eval_faults.json \
+  --repetitions 3 \
+  --max-api-calls 1200 \
+  --max-cost-usd 3.00 \
+  --output-dir results/fulfillment/eval_live_final_r3
+```
 
 ## Logs and metrics
 
-Each run writes one JSONL trace to:
+Each workflow attempt writes a JSONL trace under:
 
 ```text
-logs/<workflow>/<task_id>/<run_id>.jsonl
+logs/fulfillment/<TASK_ID>/<run-id>.jsonl
 ```
 
-Each JSONL line is one timestamped event such as a tool result or an agent completion. An
-agent-completion record contains the produced `artifact_id`, `producer_agent`, and its `sources`.
-Each source contains a `source_type` and `source_id` that points to an earlier record in the
-same trace.
+Each line is a timestamped event such as a model call, tool call, agent artifact, verification event, fault-injection event, or state change. Artifact and tool-event IDs are used to preserve dependency relationships within the trace.
 
-`experiments/metrics.py` reads a completed JSONL trace through `summarize_trace()` and
-aggregates:
+Experiment runners summarize these traces into per-trial and paired metrics. Recorded measurements include:
 
-- model-call count
-- tool-call count
-- input/output/total tokens
-- total model latency
-- end-to-end (`e2e`) workflow latency
+- model, tool, and verification call counts
+- input/output token usage and estimated inference cost
+- end-to-end and recovery latency
+- fault activation, downstream exposure, and observed corruption
+- affected stages and dependency propagation
+- policy-invalid actions attempted or executed
+- recomputed and discarded work during recovery
 
-`experiments/run_clean.py` calls this automatically after every run, and `main.py` prints the
-most useful summary fields.
+The held-out live evaluation additionally writes files such as `trials.jsonl`, `trials.csv`, `paired.csv`, `summary.json`, and `spend.json`. These preserve trial-level results and matched clean-vs-fault comparisons.
 
-To pretty-print a trace with `jq`:
+After an evaluation finishes, you can additionally run:
 
 ```bash
-jq '.' logs/fulfillment/ORD-1001/<run_id>.jsonl
+python -m experiments.analyze_live_fault_recovery \
+  results/fulfillment/eval_live_final_r3             # path to the completed evaluation 
 ```
 
-Or render the JSONL records as one JSON array:
+The analyzer writes `analysis/summary.md` for a human-readable overview, along with CSV/JSON tables for detailed analysis. Raw traces remain the underlying audit evidence.
+
+For detailed metric definitions and accounting rules, see [docs/phase1-metrics.md](docs/phase1-metrics.md).
+
+Useful trace inspection commands:
 
 ```bash
-jq -s '.' logs/fulfillment/ORD-1001/<run_id>.jsonl
+# Pretty-print one JSONL event at a time
+jq '.' logs/fulfillment/<TASK_ID>/<run-id>.jsonl
+
+# Load the full trace as a JSON array
+jq -s '.' logs/fulfillment/<TASK_ID>/<run-id>.jsonl
 ```
 
 ## Checker
@@ -153,20 +166,19 @@ jq -s '.' logs/fulfillment/ORD-1001/<run_id>.jsonl
 `workflows/fulfillment/checker.py` is called by `FulfillmentWorkflow.run()` after the Executor's
 tool actions finish. It independently checks the agent outputs and final mutable state against
 the dataset/oracle rules. The checker is not an LLM and is not just for logging: it determines
-whether a clean or future fault-injected run actually produced the correct result.
+whether a clean or fault-injected run actually produced the correct result.
 
 `fulfillment_ground_truth` is available only to the checker and is never passed to an LLM agent.
 
 ## Automatic tests
 
-The tests use a deterministic fake model, so they consume no TritonAI credits:
-
 ```bash
 python -m pytest -q
 ```
 
-They execute all 30 fulfillment cases and verify the workflow, mutable state, deterministic
-checker, source/dependency tracking, and that every source ID resolves in the same trace.
+The test suite uses deterministic fake/scripted models and consumes no TritonAI credits.
+It covers the fulfillment workflow, checker, dependency/source tracking, fault injection,
+recovery policies, evaluation data, experiment accounting, and related invariants.
 
 ## Offline fault-injection review
 
@@ -195,7 +207,7 @@ and replays all 30 saved baseline responses. See [metric definitions](docs/phase
 Unknown usage, missing action evidence, and incomplete calls stay explicit. The scripted
 fault results validate measurement behavior; they are not live-model failure rates.
 
-## Current deterministic tools 
+## Deterministic Tools 
 
 ### Order Fulfillment Workflow
 
@@ -248,5 +260,5 @@ python -m experiments.compare_recovery --output-dir /tmp/recovery-review
 
 The new directory contains `results.json` and all attempt traces, including
 propagation, discarded-call accounting, verification costs, and retry costs.
-Scripted outcomes validate the recovery harness; live-model experiments remain
-separate. Align detection and metric definitions with Workflow 2 before pooling results.
+Scripted outcomes validate the recovery harness; they should not be interpreted 
+as live-model recovery rate.
