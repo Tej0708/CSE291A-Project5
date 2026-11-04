@@ -1,25 +1,80 @@
 {
   "schema": "workflow2-phase1-v1",
-  "run_id": "e49204c2-05bf-47b2-93ad-a224da34771e",
+  "run_id": "027c32a5-9868-409b-9edb-5c341ead7013",
   "case_id": "BASE-0020-TIMEOUT",
   "base_case_id": "BASE-0020",
   "policy": "full_restart",
   "fault_type": "timeout",
   "taxonomy": "accidental_modelled",
-  "execution": "error",
-  "structural_validity": "UNKNOWN",
+  "execution": "completed",
+  "structural_validity": "PASS",
   "final_answer_quality": "UNREVIEWED",
   "recovery_success": null,
-  "activation": "NOT_ACTIVATED",
-  "actual_mutations": 0,
+  "activation": "ACTIVATED",
+  "actual_mutations": 1,
   "intended_boundary": "on_tool_call",
-  "consumption": "UNKNOWN",
-  "policy_detection": null,
-  "propagation": "N/A",
-  "paths": [],
-  "affected_stage_types": [],
-  "affected_stage_execution_count": 0,
-  "affected_executions": [],
+  "consumption": "CONSUMED",
+  "policy_detection": true,
+  "propagation": "PROPAGATED",
+  "paths": [
+    {
+      "injection_event_id": "027c32a5-9868-409b-9edb-5c341ead7013:13",
+      "injected_stage": "helper",
+      "hook": "on_tool_call",
+      "before": {
+        "status": "ok",
+        "record": {
+          "state": "fix_available",
+          "detail": "Auth node restarted; retry login.",
+          "record_id": "BASE-0020:login_failure",
+          "issue_type": "login_failure",
+          "symptom": "Unable to log in.",
+          "next_steps": [
+            "Retry logging in."
+          ],
+          "user_confirmation": "not_observed"
+        },
+        "authoritative": false
+      },
+      "after": {
+        "status": "timeout",
+        "record": null,
+        "authoritative": false
+      },
+      "candidate_event_id": "027c32a5-9868-409b-9edb-5c341ead7013:14",
+      "artifact_id": "027c32a5-9868-409b-9edb-5c341ead7013:artifact:2",
+      "producer_call_ids": [
+        "027c32a5-9868-409b-9edb-5c341ead7013:call:2",
+        "027c32a5-9868-409b-9edb-5c341ead7013:call:3"
+      ],
+      "links": [
+        {
+          "event_id": "027c32a5-9868-409b-9edb-5c341ead7013:14",
+          "relationship": "exact_record_at_helper_candidate",
+          "artifact_id": "027c32a5-9868-409b-9edb-5c341ead7013:artifact:2"
+        },
+        {
+          "event_id": "027c32a5-9868-409b-9edb-5c341ead7013:16",
+          "relationship": "timeout_control_branch"
+        }
+      ]
+    }
+  ],
+  "affected_stage_types": [
+    "helper"
+  ],
+  "affected_stage_execution_count": 1,
+  "affected_executions": [
+    {
+      "stage_type": "helper",
+      "attempt_id": 1,
+      "iteration": 1,
+      "impact": "timeout_altered_control_flow",
+      "event_ids": [
+        "027c32a5-9868-409b-9edb-5c341ead7013:16"
+      ]
+    }
+  ],
   "effect_scope_note": "Observed control/record impact only; answer semantic impact requires review. Injection site is separately identified; helper downstream effects may share its stage type. No tool side effect is inferred.",
   "unauthorized_actions": {
     "status": "N/A",
@@ -29,84 +84,110 @@
   },
   "waste": {
     "discarded_call_ids": [
-      "e49204c2-05bf-47b2-93ad-a224da34771e:call:1"
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:1",
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:2",
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:3"
     ],
     "repeated_call_ids": [],
     "union_call_ids": [
-      "e49204c2-05bf-47b2-93ad-a224da34771e:call:1"
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:1",
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:2",
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:3"
     ],
-    "union_count": 1,
+    "union_count": 3,
     "by_kind": {
-      "model": 1
+      "model": 1,
+      "tool": 2
     },
     "provider_usage": {
-      "unknown_usage_calls": 1,
+      "unknown_usage_calls": 0,
       "incomplete_calls": 0,
       "usage_scope": "observed_application_responses",
       "underlying_provider_attempt_usage_complete": null,
-      "known_input_tokens": 0,
-      "input_tokens": null,
-      "known_output_tokens": 0,
-      "output_tokens": null,
-      "known_total_tokens": 0,
-      "total_tokens": null,
-      "derived_total_tokens_known_subtotal": 0,
-      "derived_total_tokens_calls": 0,
-      "usage_complete": false
+      "known_input_tokens": 138,
+      "input_tokens": 138,
+      "known_output_tokens": 23,
+      "output_tokens": 23,
+      "known_total_tokens": 161,
+      "total_tokens": 161,
+      "derived_total_tokens_known_subtotal": 161,
+      "derived_total_tokens_calls": 1,
+      "usage_complete": true
     },
-    "call_service_time_ms": 172.17220802558586,
+    "call_service_time_ms": 772.6162079488859,
     "note": "Sum of call service times may overlap; not wall-clock waste."
   },
   "verification_overhead": {
-    "verification_call_ids": [],
-    "reference_call_ids": [],
+    "verification_call_ids": [
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:12",
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:14"
+    ],
+    "reference_call_ids": [
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:13",
+      "027c32a5-9868-409b-9edb-5c341ead7013:call:15"
+    ],
     "model_call_ids": [],
     "note": "Verifiers are deterministic; extra QA/helper retry inference belongs to recovery work."
   },
-  "policy_recovery": [],
-  "continuation": "UNKNOWN",
+  "policy_recovery": [
+    {
+      "recovery_id": "027c32a5-9868-409b-9edb-5c341ead7013:recovery:1",
+      "recovery_type": "full_restart",
+      "trigger_reason": "helper_timeout",
+      "attempt_id": 1,
+      "stage": "helper",
+      "target_attempt_id": 2,
+      "start_event_id": "027c32a5-9868-409b-9edb-5c341ead7013:17",
+      "start_ms": 788.3433329989202,
+      "end_ms": 3536.12233302556,
+      "outcome": "completed",
+      "task_quality": "UNREVIEWED",
+      "end_event_id": "027c32a5-9868-409b-9edb-5c341ead7013:63"
+    }
+  ],
+  "continuation": "POLICY_TRIGGERED",
   "metrics": {
     "metrics_schema_version": "support-cost-v2",
-    "e2e_latency_ms": 187.511500029359,
-    "model_calls": 1,
-    "started_model_calls": 1,
+    "e2e_latency_ms": 3536.1717080231756,
+    "model_calls": 5,
+    "started_model_calls": 5,
     "incomplete_model_calls": 0,
-    "failed_model_calls": 1,
-    "model_latency_ms": 172.17220802558586,
-    "known_model_latency_ms": 172.17220802558586,
-    "business_tool_calls": 0,
-    "started_business_tool_calls": 0,
+    "failed_model_calls": 0,
+    "model_latency_ms": 3515.1013339636847,
+    "known_model_latency_ms": 3515.1013339636847,
+    "business_tool_calls": 8,
+    "started_business_tool_calls": 8,
     "incomplete_business_tool_calls": 0,
     "failed_business_tool_calls": 0,
-    "business_tool_latency_ms": 0,
-    "known_business_tool_latency_ms": 0,
-    "verification_calls": 0,
-    "started_verification_calls": 0,
+    "business_tool_latency_ms": 1.006915990728885,
+    "known_business_tool_latency_ms": 1.006915990728885,
+    "verification_calls": 2,
+    "started_verification_calls": 2,
     "incomplete_verification_calls": 0,
     "failed_verification_calls": 0,
-    "verification_latency_ms": 0,
-    "known_verification_latency_ms": 0,
-    "tool_calls": 0,
+    "verification_latency_ms": 0.37874997360631824,
+    "known_verification_latency_ms": 0.37874997360631824,
+    "tool_calls": 10,
     "rejected_verification_calls": 0,
-    "repair_latency_ms": 0,
+    "repair_latency_ms": 2747.7790000266396,
     "unresolved_repairs": 0,
     "failed_repairs": 0,
     "provider_usage": {
-      "unknown_usage_calls": 1,
+      "unknown_usage_calls": 0,
       "incomplete_calls": 0,
       "usage_scope": "observed_application_responses",
       "underlying_provider_attempt_usage_complete": null,
-      "known_input_tokens": 0,
-      "input_tokens": null,
-      "known_output_tokens": 0,
-      "output_tokens": null,
-      "known_total_tokens": 0,
-      "total_tokens": null,
-      "derived_total_tokens_known_subtotal": 0,
-      "derived_total_tokens_calls": 0,
-      "usage_complete": false
+      "known_input_tokens": 1468,
+      "input_tokens": 1468,
+      "known_output_tokens": 179,
+      "output_tokens": 179,
+      "known_total_tokens": 1647,
+      "total_tokens": 1647,
+      "derived_total_tokens_known_subtotal": 1647,
+      "derived_total_tokens_calls": 5,
+      "usage_complete": true
     },
-    "discarded_calls": 1,
+    "discarded_calls": 3,
     "discarded_categories": [
       "model",
       "business_tool",
@@ -114,27 +195,27 @@
     ],
     "discarded_by_kind": {
       "model": 1,
-      "business_tool": 0,
+      "business_tool": 2,
       "verification": 0
     },
     "discarded_provider_usage": {
-      "unknown_usage_calls": 1,
+      "unknown_usage_calls": 0,
       "incomplete_calls": 0,
       "usage_scope": "observed_application_responses",
       "underlying_provider_attempt_usage_complete": null,
-      "known_input_tokens": 0,
-      "input_tokens": null,
-      "known_output_tokens": 0,
-      "output_tokens": null,
-      "known_total_tokens": 0,
-      "total_tokens": null,
-      "derived_total_tokens_known_subtotal": 0,
-      "derived_total_tokens_calls": 0,
-      "usage_complete": false
+      "known_input_tokens": 138,
+      "input_tokens": 138,
+      "known_output_tokens": 23,
+      "output_tokens": 23,
+      "known_total_tokens": 161,
+      "total_tokens": 161,
+      "derived_total_tokens_known_subtotal": 161,
+      "derived_total_tokens_calls": 1,
+      "usage_complete": true
     },
     "discarded_latency_ms": {
-      "model": 172.17220802558586,
-      "business_tool": 0,
+      "model": 771.7862919671461,
+      "business_tool": 0.8299159817397594,
       "verification": 0
     }
   },
