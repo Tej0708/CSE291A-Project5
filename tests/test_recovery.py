@@ -119,15 +119,27 @@ def test_programming_errors_are_not_retried(mode, tmp_path):
     assert not any(row['event_type'] == 'stage_retry' for row in read_trace(result.log_path))
 
 
-@pytest.mark.parametrize('mode', ['unprotected', 'always_verify'])
-def test_restart_detector_only_runs_in_restart_mode(mode, tmp_path, monkeypatch):
-    from workflows.fulfillment import workflow as module
-
-    def unexpected_detector(*args):
-        raise AssertionError('Restart detector should not run for this policy')
-
-    # The checker retains its independent final-state evaluation.
-    monkeypatch.setattr(module, 'final_state_errors', unexpected_detector)
+def test_oracle_restarts_even_when_injection_is_ignored(tmp_path):
+    fault = next(f for f in default_faults() if f.fault_type == 'prompt_injection')
     workflow = FulfillmentWorkflow(model_client=ScriptedModelClient(), log_dir=tmp_path)
-    result = workflow.run('ORD-1001', mode=mode)
-    assert result.check.passed
+    result = workflow.run(fault.case_id, fault=fault, mode='full_restart')
+    assert result.attempts[0].check.passed
+    assert len(result.attempts) == 2
+    assert result.attempts[0].fault_applied
+    assert not result.attempts[1].fault_applied
+    assert result.fault_applied
+    detection = [e for e in read_trace(result.attempts[0].log_path)
+                 if e['event_type'] == 'failure_detection_completed']
+    assert detection[0]['data']['policy'] == 'oracle_fault_applied'
+
+
+def test_clean_failure_does_not_trigger_oracle_restart(tmp_path):
+    class FailedModel(ScriptedModelClient):
+        def generate(self, **kwargs):
+            raise ValueError('No injected fault')
+
+    workflow = FulfillmentWorkflow(model_client=FailedModel(), log_dir=tmp_path)
+    result = workflow.run('ORD-1001', mode='full_restart')
+    assert result.run_status == 'error'
+    assert not result.fault_applied
+    assert len(result.attempts) == 1

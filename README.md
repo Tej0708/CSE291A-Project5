@@ -2,7 +2,8 @@
 
 This branch implements the order-fulfillment workflow and Phase 1 experiment tooling.
 The clean baseline, offline fault-injection review, and offline metric validation are
-complete. Comparison runners and the bounded live fault pilot remain pending. See
+complete. Offline comparison and paired live experiment runners are available;
+the bounded live fault pilot remains pending. See
 [Phase 1 progress](docs/phase1-progress.md) for completed work and the next step.
 
 ## Setup (bash/macOS/Linux)
@@ -92,6 +93,23 @@ through the same CLI, for example:
 ```bash
 python main.py --workflow support --task-id TKT-2001
 ```
+
+## Paired live fault/recovery experiments
+
+A separate [Workflow 1 evaluation dataset](docs/fulfillment-evaluation.md) provides
+30 new orders and 10 matching fault schedules, with commands for selecting them.
+
+Use Python 3.10 or newer. Start with the offline smoke test (no API calls):
+
+```bash
+python -m experiments.run_live_fault_recovery --scripted \
+  --fault-id F-FUL-01 --output-dir results/fulfillment/fault_smoke_01
+```
+
+The runner pairs clean and injected runs under `unprotected`, `full_restart`, and
+`always_verify`, saving trial metrics, comparisons, traces, and completion status.
+See [live experiment instructions](docs/live-fault-recovery.md) for budgeted live
+commands and interpretation limits. Live experiments have not been run.
 
 ## Logs and metrics
 
@@ -199,10 +217,11 @@ State-changing tools used by the Executor:
 Use Python 3.10 or newer. Select a policy with `--mode full_restart` or
 `--mode always_verify` on `main.py`; the default remains `unprotected`.
 
-- `full_restart` detects exceptions, an incorrect final plan, or an incorrect simulated state using
-  authoritative business records, then permits one complete retry from fresh
-  dataset state. It does not use the final checker's gold-label verdict as a trigger.
-  Intermediate errors that leave a correct final plan and state do not trigger a restart.
+- `full_restart` is an oracle baseline: if a fault was actually injected
+  (`fault_applied=true`), it permits one complete retry from fresh dataset state,
+  even when the first attempt was correct or ignored the injected content.
+  Clean runs and faults that were never applied do not trigger a restart.
+  Infrastructure, configuration, programming, and budget errors still block retries.
 - `always_verify` independently checks every produced artifact after injection and
   before downstream consumption, including executor actions before dispatch.
   A rejected output or stage exception permits one fresh stage invocation and a

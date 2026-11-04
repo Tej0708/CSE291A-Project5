@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import asdict, replace
-import time
 
 from core.artifact import artifact_source, tool_event_source
 from core.budget import RunBudget
@@ -17,7 +16,7 @@ from .faults import FaultInjector, FaultSpec
 from .models import ExecutionDecision
 from .state import FulfillmentState
 from .tools import FulfillmentTools
-from .validation import differences, reference_artifacts, final_state_errors
+from .validation import differences, reference_artifacts
 from .verifier import VerificationError, verify_artifact
 
 
@@ -39,7 +38,7 @@ class FulfillmentWorkflow(Workflow):
         budget = budget or RunBudget()
         first = self._run_attempt(task_id, fault=fault, mode=mode, budget=budget)
         attempts = [first]
-        if mode == 'full_restart' and first.recovery_detected and self._retryable(first.error_type):
+        if mode == 'full_restart' and first.fault_applied and self._retryable(first.error_type):
             second = self._run_attempt(task_id, fault=None, mode=mode, budget=budget)
             attempts.append(second)
         return replace(attempts[-1], attempts=tuple(attempts),
@@ -157,22 +156,13 @@ class FulfillmentWorkflow(Workflow):
             error, error_type = str(exc), getattr(exc, 'error_type', type(exc).__name__)
             failed_stage = logger.last_stage
 
-        # Runtime detector uses business records and observed state, never gold labels.
-        recovery_detected = bool(error)
+        # Full restart is an oracle baseline: injection evidence is the trigger,
+        # regardless of whether the fault affected correctness or was consumed.
+        recovery_detected = injector.applied if mode == 'full_restart' else bool(error)
         if mode == 'full_restart':
-            detection_started = time.perf_counter()
-            detection_errors = final_state_errors(self.dataset, initial, state, task_id)
-            # The simulated state does not store quoted totals; validate the final
-            # plan as well so incorrect billing decisions are observable.
-            expected_plan = reference_artifacts(self.dataset, initial, task_id)['planning_agent']
-            for artifact in artifacts:
-                if artifact.stage == 'planning_agent':
-                    detection_errors.extend(differences(artifact.value, expected_plan))
-            recovery_detected = bool(error or detection_errors)
             logger.log('failure_detection_completed', data={
-                'detected': recovery_detected, 'errors': detection_errors,
-                'latency_ms': (time.perf_counter() - detection_started) * 1000,
-                'error_type': error_type, 'policy': 'exception_or_final_plan_and_state_validation'})
+                'detected': injector.applied, 'errors': [], 'latency_ms': 0,
+                'error_type': error_type, 'policy': 'oracle_fault_applied'})
 
         check, task_check, stage_checks = assess_run(
             order_id=task_id, dataset=self.dataset, initial_state=initial,
