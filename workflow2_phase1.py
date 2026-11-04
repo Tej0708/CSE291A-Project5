@@ -75,10 +75,10 @@ def prepare(config,output):
     manifest['manifest_id']=hashlib.sha256(canonical(manifest).encode()).hexdigest();write(output,manifest)
     return manifest
 
-def validate_manifest(m):
+def validate_manifest(m, source_hashes=None):
     body={k:v for k,v in m.items() if k!='manifest_id'}
     if hashlib.sha256(canonical(body).encode()).hexdigest()!=m['manifest_id']:raise ValueError('Manifest identity mismatch')
-    if any(sha(ROOT/n)!=h for n,h in m['source_hashes'].items()):raise ValueError('Source/data/configuration drift; prepare a new manifest')
+    if any(sha(ROOT/n)!=h for n,h in (source_hashes if source_hashes is not None else m['source_hashes']).items()):raise ValueError('Source/data/configuration drift; prepare a new manifest')
     if len(m['run_order'])!=m['expected_run_count'] or len({r['slot_id'] for r in m['run_order']})!=len(m['run_order']):raise ValueError('Invalid run identity')
 
 def resume_state(out,m):
@@ -89,22 +89,28 @@ def resume_state(out,m):
         if not (d/'complete.json').exists():raise ValueError('Partial run preserved; automatic replay forbidden: '+slot['slot_id'])
         receipt=read(d/'complete.json')
         if receipt['manifest_id']!=m['manifest_id'] or receipt['slot_id']!=slot['slot_id'] or receipt['result_sha256']!=sha(d/'result.json'):raise ValueError('Completion receipt mismatch')
-        if receipt['execution']=='budget_exhausted' or not receipt['sanity_passed']:raise ValueError('Recorded infrastructure/budget/sanity stop requires an explicit new protocol; no automatic replay')
+        if receipt['execution'] not in ('completed','failed') or not receipt['sanity_passed']:raise ValueError('Recorded infrastructure/budget/sanity stop requires an explicit new protocol; no automatic replay')
         complete.append(slot['slot_id'])
     return complete
 
-def execute(manifest_path,out,resume=False):
-    m=read(manifest_path);validate_manifest(m);out=Path(out)
+def execute(manifest_path,out,resume=False,continuation=None):
+    m=read(manifest_path);out=Path(out);plan=None
+    if continuation:
+        if not resume:raise ValueError('Infrastructure continuation requires --resume')
+        from infrastructure_continuation import validate_plan, archive_interruption
+        plan=validate_plan(continuation,out,m)
+    validate_manifest(m, source_hashes=plan['source_hashes'] if plan else None)
     if resume:
         if read(out/'manifest.json')!=m:raise ValueError('Resume manifest differs')
     else:out.mkdir(parents=True,exist_ok=False);write(out/'manifest.json',m)
     # Atomic exclusive ownership. Stale lock must be inspected, never auto-deleted.
     lock=out/'.execution.lock';fd=os.open(str(lock),os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600);os.close(fd)
     try:
+        if plan:archive_interruption(out,plan)
         done=resume_state(out,m)
         gate=SpendGate({'verified':False,'project_request_limit':m['config'].get('request_limit')},pilot_ceiling=False)
         starts=[]
-        for p in out.glob('*/provider_requests.jsonl'):
+        for p in [*out.glob('*/provider_requests.jsonl'), *out.glob('_infrastructure_attempts/*/*/provider_requests.jsonl')]:
             starts.extend(json.loads(line) for line in p.read_text().splitlines() if json.loads(line)['status']=='started')
         gate.requests=len(starts)
         if len(done)==len(m['run_order']):return
@@ -116,7 +122,9 @@ def execute(manifest_path,out,resume=False):
             if slot['slot_id'] in done:continue
             if gate.request_limit is not None and gate.requests>=gate.request_limit:break
             d=out/slot['slot_id'];d.mkdir()
-            write(d/'identity.json',dict(manifest_id=m['manifest_id'],slot=slot))
+            write(d/'identity.json',dict(manifest_id=m['manifest_id'],slot=slot,
+                continuation_plan_sha256=sha(continuation) if plan else None,
+                infrastructure_retry_of=plan['archive_relative_path'] if plan and slot['slot_id']==plan['slot_id'] else None))
             r,u,check=execute_one(cases[slot['case_id']],slot['policy'],client,gate,d)
             write(d/'phase1.json',measure(r))
             write(d/'complete.json',dict(manifest_id=m['manifest_id'],slot_id=slot['slot_id'],result_sha256=sha(d/'result.json'),execution=r['status'],sanity_passed=check['passed']))
@@ -185,6 +193,8 @@ def analyze(run_dir,output,review=None):
                 a=row['metrics'].get('provider_usage',{}).get(metric);b=base['metrics'].get('provider_usage',{}).get(metric) if base else None
                 values[metric]={'delta':a-b if a is not None and b is not None else None,'percent':100*(a/b-1) if a is not None and b not in (None,0) else None}
             row['paired_differences'][name]=values
+    from infrastructure_continuation import infrastructure_accounting
+    write(out/'infrastructure_attempts.json',infrastructure_accounting(run))
     write(out/'measurements.json',rows)
     from collections import Counter
     draft_counts={part:dict(Counter(review_quality([{'event_id':x['event_id'],'issue':x['issue']}],verdicts,True,[x['issue']]) for x in export if part=='all' or x['retained']==(part=='retained'))) for part in ('all','retained','discarded')}
@@ -198,11 +208,11 @@ def main():
     p=argparse.ArgumentParser();sub=p.add_subparsers(dest='cmd',required=True)
     ap=sub.add_parser('applicability');ap.add_argument('--output',required=True)
     prep=sub.add_parser('prepare');prep.add_argument('--config',required=True);prep.add_argument('--output',required=True)
-    ex=sub.add_parser('execute');ex.add_argument('--manifest',required=True);ex.add_argument('--output',required=True);ex.add_argument('--resume',action='store_true')
+    ex=sub.add_parser('execute');ex.add_argument('--manifest',required=True);ex.add_argument('--output',required=True);ex.add_argument('--resume',action='store_true');ex.add_argument('--continuation-plan')
     an=sub.add_parser('analyze');an.add_argument('--run-dir',required=True);an.add_argument('--output',required=True);an.add_argument('--reviews')
     a=p.parse_args()
     if a.cmd=='applicability':write(a.output,applicability())
     elif a.cmd=='prepare':prepare(a.config,a.output)
-    elif a.cmd=='execute':execute(a.manifest,a.output,a.resume)
+    elif a.cmd=='execute':execute(a.manifest,a.output,a.resume,a.continuation_plan)
     else:analyze(a.run_dir,a.output,a.reviews)
 if __name__=='__main__':main()
