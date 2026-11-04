@@ -10,7 +10,7 @@ Execution is sequential. Seed 42 shuffles the sorted selected IDs. Each case run
 
 Saved settings: api-glm-5.3-flash, temperature 0, other generation parameters omitted (provider defaults), 120-second timeout, zero SDK retries. Each case retains four iterations, 40 model / 40 tool / 40 verification dispatch limits, at most one full restart, and at most one retry per verified stage. The existing run-wide transient injector prevents reinjection on retries/restarts. TIMEOUT is synthetic status injection, not a measured provider timeout.
 
-The inherited 150-request cap was a pilot-wide application cap, not a provider limit or a count of experimental runs. It remains the smoke runner default; full execution uses request_limit=null. Pricing is optional and unknown cost stays null. Provider limits are respected; provider failures are journaled and stop dispatch. Resume skips their terminal receipts and continues with the next scheduled tuple without retrying failed experimental runs.
+The inherited 150-request cap was a pilot-wide application cap, not a provider limit or a count of experimental runs. It remains the smoke runner default; full execution uses request_limit=null. Pricing is optional and unknown cost stays null. Provider limits are respected; provider failures are journaled and stop dispatch. Ordinary resume refuses infrastructure error receipts. An explicit, evidence-bound infrastructure continuation plan can archive one interrupted attempt and re-execute that slot; see CONTINUATION.md.
 
 ## Run and resume
 
@@ -22,7 +22,7 @@ RUN_DIR="results/workflow2_phase1_$(date +%Y%m%d_%H%M%S)"
 .venv/bin/python workflow2_phase1.py execute --manifest phase1_v1/full_manifest.json --output "$RUN_DIR" --resume
 ```
 
-Keep RUN_DIR set to the same directory when resuming; in a new shell assign the actual prior path. Completed results are hash-checked and never overwritten. Resume is safe at inter-run boundaries and after logged provider failures. A mid-run interruption preserves partial evidence and refuses automatic replay, avoiding duplicate executions/reinjection. A killed process may leave `.execution.lock`; inspect that no process is running before removing the stale lock. Partial runs or failed sanity checks require an explicit protocol decision; do not delete evidence to rerun them. Analysis includes partial and unexecuted slots.
+Keep RUN_DIR set to the same directory when resuming; in a new shell assign the actual prior path. Completed results are hash-checked and never overwritten. Resume is safe at inter-run boundaries. Logged provider failures require an explicit continuation plan. A mid-run interruption preserves partial evidence and refuses automatic replay, avoiding duplicate executions/reinjection. A killed process may leave `.execution.lock`; inspect that no process is running before removing the stale lock. Partial runs or failed sanity checks require an explicit protocol decision; do not delete evidence to rerun them. Analysis includes partial and unexecuted slots.
 
 For offline preparation after an intentional source change, use `prepare --config phase1_v1/full_config.json --output NEW_MANIFEST.json`; existing manifests cannot be overwritten. Do not replace a manifest mid-experiment.
 

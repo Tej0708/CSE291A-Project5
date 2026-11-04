@@ -47,13 +47,13 @@ class FullDesignTests(unittest.TestCase):
    analyze(t/'runs',t/'reviewed',t/'analysis/review_template.csv')
    print('Full offline fixture: 240 runs, %d provider dispatches, immutable resume and review export/import passed.'%len(sdk.requests))
 
- def test_provider_error_preserved_and_resume_continues(self):
+ def test_provider_error_preserved_and_resume_blocks(self):
   from workflow2_phase1 import write
   with tempfile.TemporaryDirectory() as temp,patch.object(socket.socket,'connect',side_effect=AssertionError('Offline only')):
    t=Path(temp);cfg=read(ROOT/'phase1_v1/full_config.json');cfg['base_case_ids']=['BASE-0004'];cfg['scenarios']=['NONE'];write(t/'cfg.json',cfg)
    prepare(t/'cfg.json',t/'m.json')
    with patch('workflow2_phase1.OpenAIClient',return_value=client(FakeSDK(fail=True))),contextlib.redirect_stdout(io.StringIO()):execute(t/'m.json',t/'runs')
    first=next((t/'runs').glob('*/result.json'));original=sha(first)
-   with patch('workflow2_phase1.OpenAIClient',return_value=client(FakeSDK())),contextlib.redirect_stdout(io.StringIO()):execute(t/'m.json',t/'runs',True)
-   self.assertEqual(sha(first),original);self.assertEqual(len(list((t/'runs').glob('*/complete.json'))),3)
+   with patch('workflow2_phase1.OpenAIClient',side_effect=AssertionError('No silent skip')),self.assertRaisesRegex(ValueError,'explicit new protocol'):execute(t/'m.json',t/'runs',True)
+   self.assertEqual(sha(first),original);self.assertEqual(len(list((t/'runs').glob('*/complete.json'))),1)
 if __name__=='__main__':unittest.main()

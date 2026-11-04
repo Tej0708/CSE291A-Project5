@@ -132,6 +132,33 @@ class SpendGate:
                 'blocked': self.blocked, 'configuration_violation': self.violation}
 
 
+def sanitized_provider_error(exc, sdk):
+    """Allowlisted provider fields only; never serialize exception/request/headers."""
+    import os, re
+    secrets = [v for k,v in os.environ.items()
+               if any(part in k.upper() for part in ('KEY','TOKEN','SECRET','PASSWORD')) and len(v)>3]
+    key = getattr(sdk, 'api_key', None)
+    if isinstance(key, str) and key:secrets.append(key)
+    def clean(value):
+        if not isinstance(value, (str,int,float)):return None
+        text = str(value)
+        for secret in sorted(secrets,key=len,reverse=True):text=text.replace(secret,'[REDACTED]')
+        text=re.sub(r'https?://[^\s]+','[URL REDACTED]',text)
+        text=re.sub(r'(?i)bearer\s+[^\s,;]+','Bearer [REDACTED]',text)
+        text=re.sub(r'(?i)(api[_-]?key|authorization|token|password|secret)\s*[=:]\s*[^\s,;]+',r'\1=[REDACTED]',text)
+        text=re.sub(r'\b(?:sk-|gh[pousr]_)[A-Za-z0-9_-]+','[REDACTED]',text)
+        return ''.join(c if c.isprintable() else ' ' for c in text)[:2000]
+    body=getattr(exc,'body',None)
+    if isinstance(body,dict) and isinstance(body.get('error'),dict):body=body['error']
+    body=body if isinstance(body,dict) else {}
+    response=getattr(exc,'response',None)
+    headers=getattr(response,'headers',{}) or {}
+    return dict(provider_error_code=clean(body.get('code',getattr(exc,'code',None))),
+                provider_error_type=clean(body.get('type',getattr(exc,'type',None))),
+                provider_error_message=clean(body.get('message')),
+                retry_after=clean(headers.get('retry-after')))
+
+
 class ProviderBoundary:
     """One SDK dispatch per request, with saved SDK retries=0; no hidden retries."""
     def __init__(self, sdk, gate, runner, path):
@@ -179,7 +206,8 @@ class ProviderBoundary:
             return response
         except BaseException as exc:
             row.update(status='failed', usage=None, estimated_observed_usd=None,
-                       error_type=type(exc).__name__, status_code=getattr(exc, 'status_code', None))
+                       error_type=type(exc).__name__, status_code=getattr(exc, 'status_code', None),
+                       **sanitized_provider_error(exc, self.sdk))
             raise
         finally:
             row['duration_ms'] = (time.perf_counter() - started) * 1000
