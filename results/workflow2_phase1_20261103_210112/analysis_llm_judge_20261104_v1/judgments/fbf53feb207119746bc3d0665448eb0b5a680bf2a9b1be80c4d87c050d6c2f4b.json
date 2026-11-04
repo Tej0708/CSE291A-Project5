@@ -1,0 +1,146 @@
+{
+  "job_id": "fbf53feb207119746bc3d0665448eb0b5a680bf2a9b1be80c4d87c050d6c2f4b",
+  "input_hash": "fbf53feb207119746bc3d0665448eb0b5a680bf2a9b1be80c4d87c050d6c2f4b",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 287,
+  "evaluated_at": "2026-11-04T20:13:34.575284+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The password_reset record matches the requested scenario (non-working reset link) and supplies the reissued link, delivery channel, and 30-minute validity needed for an appropriate answer; the incorrect_invoice record also aligns with the invoice complaint.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/issue_type",
+            "value": "password_reset"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/detail",
+            "value": "Reset link reissued, valid 30m."
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer directly addresses the helper's assigned password_reset issue; the invoice issue is covered by the other retained answer in the same attempt, which is out of scope for this helper.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/user_request",
+            "value": "The invoice amount looks incorrect. Also, the password reset link does not work."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts (new link issued, delivery via account email, 30-minute validity) are explicitly supported by the password_reset record; no refund timing/destination or invented guarantees are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "valid for 30 minutes"
+          },
+          {
+            "answer_index": 0,
+            "quote": "sent to your account email"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer gives the needed conclusion (reissued link) and the supported next step (use within 30 minutes) plus a conditional follow-up; the bundle's other expected issue (incorrect_invoice) is covered by the retained earlier answer at $19.00 USD, matching the authoritative record.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password. If the link still doesn't work, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps",
+            "value": [
+              "Use the reissued reset link within 30 minutes."
+            ]
+          },
+          {
+            "path": "/workflow_context/earlier_answers_in_same_attempt/0/answer",
+            "value": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD. Please review the reissued invoice to confirm the amount now looks right to you. If anything still appears off, let us know and we'll take another look."
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available fix (reissued link) without claiming verified repair, and keeps scope without demanding a new ticket for either included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the link still doesn't work, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

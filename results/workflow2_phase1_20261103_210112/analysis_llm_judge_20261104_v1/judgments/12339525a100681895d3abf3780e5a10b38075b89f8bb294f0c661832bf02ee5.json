@@ -1,0 +1,145 @@
+{
+  "job_id": "12339525a100681895d3abf3780e5a10b38075b89f8bb294f0c661832bf02ee5",
+  "input_hash": "12339525a100681895d3abf3780e5a10b38075b89f8bb294f0c661832bf02ee5",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 557,
+  "evaluated_at": "2026-11-04T20:26:28.087764+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The app_crash record matches the requested Settings-crash scenario (same symptom, issue_type, build fix and next steps), and the refund record supports the other requested issue, so the environment provides enough evidence for an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/symptom",
+            "value": "Opening Settings causes the app to crash."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/state",
+            "value": "completed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (app_crash) directly; the refund is another helper's issue and not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "refund_status",
+              "app_crash"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Build 7.9.3, installation via the existing channel, and reopening Settings are all explicitly supported by the authoritative app_crash record. No refund timing or destination claims are made in this answer, and no material facts are invented.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has a fix available in build 7.9.3. Please install that build through your existing installation channel, then reopen Settings to see if the crash persists."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/detail",
+            "value": "Settings crash patched in build 7.9.3."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the needed conclusion (fix available in build 7.9.3) and both supported remediation/verification steps (install via existing channel, reopen Settings to check), plus conditional follow-up. Draft coverage is limited to the assigned issue, so omitting the refund is acceptable.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists. If it still crashes afterward, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available build-level fix ('fix available in build 7.9.3'), which the record explicitly supports (state fix_available, detail 'patched in build 7.9.3'); it does not claim the user's device is already repaired and preserves the need for retest. No new-ticket demand and no unsupported whole-case closure.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          },
+          {
+            "answer_index": 0,
+            "quote": "then reopen Settings to see if the crash persists"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

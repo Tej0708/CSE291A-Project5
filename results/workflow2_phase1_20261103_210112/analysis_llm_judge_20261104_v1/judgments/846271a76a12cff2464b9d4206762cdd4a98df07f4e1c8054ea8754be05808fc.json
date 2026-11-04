@@ -1,0 +1,198 @@
+{
+  "job_id": "846271a76a12cff2464b9d4206762cdd4a98df07f4e1c8054ea8754be05808fc",
+  "input_hash": "846271a76a12cff2464b9d4206762cdd4a98df07f4e1c8054ea8754be05808fc",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 628,
+  "evaluated_at": "2026-11-04T20:29:13.662215+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative records match both requested issues: a reissued password reset link (fix_available, 30-minute validity, account email channel) for the broken reset link, and an active subscription status with a refreshed account display for the wrong-looking status. Both provide enough evidence for an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Our records show your subscription as active through the current billing cycle, and the account status display has been refreshed."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record",
+            "value": {
+              "delivery_channel": "account email",
+              "detail": "Reset link reissued, valid 30m.",
+              "issue_type": "password_reset",
+              "next_steps": [
+                "Use the reissued reset link within 30 minutes."
+              ],
+              "record_id": "BASE-0008:password_reset",
+              "state": "fix_available",
+              "user_confirmation": "not_observed",
+              "valid_for_minutes": 30
+            }
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record",
+            "value": {
+              "detail": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed.",
+              "displayed_status": "active",
+              "issue_type": "subscription_status",
+              "next_steps": [
+                "Refresh the account page to check the updated status."
+              ],
+              "record_id": "BASE-0008:subscription_status",
+              "state": "active"
+            }
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its own assigned issue only: the password_reset answer covers the reset link, and the subscription_status answer covers the subscription status. Neither needs to address the other helper's issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please refresh your account page to check whether the status now shows correctly."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "password_reset"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Password answer's claims (new link sent to account email, valid 30 minutes) match the authoritative record's delivery_channel and valid_for_minutes. Subscription answer's material facts (active through current billing cycle, display refreshed) match the authoritative record's detail and displayed_status. No refund timing/destination or invented guarantees are present. The hedge 'this record has not been fully confirmed' is a conservative uncertainty statement, not an invented material fact, guarantee, or unsupported completed action.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Our records show your subscription as active through the current billing cycle, and the account status display has been refreshed."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Both expected issues are covered with their needed conclusions and next steps: password_reset includes the reissued link, the 30-minute usage window, and follow-up if it fails; subscription_status includes the active-status conclusion, the refresh-and-check verification step, and follow-up if the status still appears wrong. The bundle covers all expected issues and execution completed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password. If the link still doesn't work after that, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please refresh your account page to check whether the status now shows correctly. If it still appears wrong, let us know so we can verify further"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "password_reset"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps",
+            "value": [
+              "Use the reissued reset link within 30 minutes."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "Neither answer claims verified user-side repair. The password answer reports a supported completed action (link reissued/sent) and asks the user to retry with conditional follow-up. The subscription answer reports the supported display refresh, asks the user to verify by refreshing, and explicitly preserves that the record is not fully confirmed rather than asserting whole-case closure. No new-ticket demand is made for any included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the link still doesn't work after that, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "If it still appears wrong, let us know so we can verify further, since this record has not been fully confirmed."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

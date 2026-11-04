@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-85ad045ee05fac11",
+  "created": 1793823349,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"Both records fit the requested scenarios: the duplicate_charge record confirms a $49.00 USD refund_issued state, and the installation_failure record describes the desktop installer rejecting the OS as unsupported with applicable next steps. The absence of specific supported OS versions does not prevent an appropriate response since the answer does not name specific versions.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"The duplicate charge has been reversed, and a refund of $49.00 USD has been issued.\"},{\"answer_index\":1,\"quote\":\"The installer rejection is confirmed: your current operating system isn't supported by the requested update.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/state\",\"value\":\"refund_issued\"},{\"path\":\"/original_authoritative_records/installation_failure/record/symptom\",\"value\":\"Desktop installer rejects the operating system as unsupported.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"Each answer addresses its assigned issue only: the first covers the duplicate charge/refund, the second covers the installation failure. Neither substitutes an unrelated issue, and draft coverage is limited to assigned_issue.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"The duplicate charge has been reversed, and a refund of $49.00 USD has been issued.\"},{\"answer_index\":1,\"quote\":\"To resolve it, check the update's requirements and switch to a supported operating system, then retry the installation.\"}],\"source_fields\":[{\"path\":\"/answers/0/assigned_issue\",\"value\":\"duplicate_charge\"},{\"path\":\"/answers/1/assigned_issue\",\"value\":\"installation_failure\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"FAIL\",\"explanation\":\"Answer 0's refund amount, currency, and issued state are supported by the authoritative record, and no refund destination is asserted. However, 'Please allow your bank's standard posting time' is an unsupported refund-timing claim (unsupported 'bank's standard processing time' framing) with no record basis. Answer 1's facts are supported by the installation_failure record, including the compatibility finding and next steps.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"Please allow your bank's standard posting time for the refund to appear on your statement.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record\",\"value\":{\"amount\":49.0,\"currency\":\"USD\",\"detail\":\"Duplicate charge reversed.\",\"issue_type\":\"duplicate_charge\",\"record_id\":\"BASE-0027:duplicate_charge\",\"state\":\"refund_issued\"}},{\"path\":\"/original_authoritative_records/installation_failure/record/next_steps\",\"value\":[\"Check the update requirements and use an operating system supported by that update.\",\"Retry installation after the operating system requirement is met.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"Answer 0 includes the needed conclusion (refund issued, $49.00 USD) and a follow-up step. Answer 1 includes the diagnosis, remediation steps (check requirements, switch to supported OS, retry), and a conditional follow-up. Both expected issues are covered by the retained bundle; no record fields need to be repeated verbatim.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If the duplicate charge still shows after the refund posts, let us know.\"},{\"answer_index\":1,\"quote\":\"check the update's requirements and switch to a supported operating system, then retry the installation. If it still fails after meeting the OS requirement, let us know.\"}],\"source_fields\":[{\"path\":\"/expected_issues\",\"value\":[\"duplicate_charge\",\"installation_failure\"]},{\"path\":\"/original_authoritative_records/installation_failure/record/next_steps\",\"value\":[\"Check the update requirements and use an operating system supported by that update.\",\"Retry installation after the operating system requirement is met.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"Answer 0 reports a supported completed intervention (refund issued per record) without claiming whole-case closure or demanding a new ticket. Answer 1 describes an available fix with conditional prospective language ('If it still fails...') and preserves the need for retest; no definite repair claim is made. Neither answer requires resubmission of an already-included issue.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"The duplicate charge has been reversed, and a refund of $49.00 USD has been issued.\"},{\"answer_index\":1,\"quote\":\"If it still fails after meeting the OS requirement, let us know.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/state\",\"value\":\"refund_issued\"},{\"path\":\"/original_authoritative_records/installation_failure/record/state\",\"value\":\"fix_available\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"FAIL\",\"human_followup_needed\":true}",
+        "role": "assistant",
+        "reasoning_content": "Two answers. Duplicate charge: refund $49 USD issued — supported. \"Please allow your bank's standard posting time\" — unsupported refund timing → grounding FAIL (per rubric, \"bank's standard processing time\" fails). Destination not asserted — fine.\n\nInstallation failure: \"your current operating system isn't supported by the requested update\" — supported. \"check the update's requirements and switch to a supported operating system, then retry\" — supported by next_steps. No definite repair claim. Coverage: gives remediation and verification. PASS.\n\nRecord alignment: duplicate_charge record fits; installation_failure record fits (compatibility check, next steps). supported_os_versions not provided but answer doesn't claim specific versions. Alignment PASS.\n\nOverall: FAIL (grounding FAIL on duplicate charge answer). Human follow-up true.",
+        "provider_specific_fields": {
+          "reasoning": "Two answers. Duplicate charge: refund $49 USD issued — supported. \"Please allow your bank's standard posting time\" — unsupported refund timing → grounding FAIL (per rubric, \"bank's standard processing time\" fails). Destination not asserted — fine.\n\nInstallation failure: \"your current operating system isn't supported by the requested update\" — supported. \"check the update's requirements and switch to a supported operating system, then retry\" — supported by next_steps. No definite repair claim. Coverage: gives remediation and verification. PASS.\n\nRecord alignment: duplicate_charge record fits; installation_failure record fits (compatibility check, next steps). supported_os_versions not provided but answer doesn't claim specific versions. Alignment PASS.\n\nOverall: FAIL (grounding FAIL on duplicate charge answer). Human follow-up true."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1175,
+    "prompt_tokens": 4267,
+    "total_tokens": 5442,
+    "completion_tokens_details": {
+      "reasoning_tokens": 161
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}

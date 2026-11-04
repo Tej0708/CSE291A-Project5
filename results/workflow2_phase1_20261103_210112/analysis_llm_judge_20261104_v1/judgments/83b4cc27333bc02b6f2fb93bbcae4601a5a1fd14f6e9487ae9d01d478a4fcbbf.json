@@ -1,0 +1,178 @@
+{
+  "job_id": "83b4cc27333bc02b6f2fb93bbcae4601a5a1fd14f6e9487ae9d01d478a4fcbbf",
+  "input_hash": "83b4cc27333bc02b6f2fb93bbcae4601a5a1fd14f6e9487ae9d01d478a4fcbbf",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 610,
+  "evaluated_at": "2026-11-04T20:28:02.935216+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested issues: a password_reset record with a reissued link (30-minute validity, account email channel) and a subscription_status record confirming active status with a display refresh, providing sufficient evidence for appropriate answers.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your subscription is confirmed active through the current billing cycle"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/issue_type",
+            "value": "password_reset"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/displayed_status",
+            "value": "active"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue only: the password_reset answer covers the non-working reset link, and the subscription_status answer covers the incorrect status display. Neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the link still doesn't work after that, let us know and we can reissue it."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please refresh your account page to check the updated status."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "password_reset"
+            ]
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "subscription_status"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts are supported by the authoritative records: reissued link sent to account email with 30-minute validity, and ledger-confirmed active subscription through the current billing cycle with a refreshed status display. No invented timing, destination, or guarantees.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "it's valid for 30 minutes, so please use it soon"
+          },
+          {
+            "answer_index": 1,
+            "quote": "the account status display has been refreshed"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Both expected issues are covered with the needed conclusions and next steps: use the reissued link within 30 minutes (with reissue fallback) and refresh the account page to verify the updated status (with follow-up if still wrong). Execution completed and no expected issue is missing.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the link still doesn't work after that, let us know and we can reissue it."
+          },
+          {
+            "answer_index": 1,
+            "quote": "If it still shows incorrectly after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps",
+            "value": [
+              "Use the reissued reset link within 30 minutes."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "password_reset"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The password_reset answer describes a supported completed action (link reissued) without claiming verified user-side repair, and uses conditional follow-up. The subscription_status answer reports the ledger-confirmed active status at its actual scope and asks the user to verify via refresh. No new-ticket demand and no unsupported whole-case closure.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your subscription is confirmed active through the current billing cycle"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

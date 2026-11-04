@@ -1,0 +1,153 @@
+{
+  "job_id": "bace1de41ef448f486b3b06df84b8a21015264535e563d671b601cffbea412e0",
+  "input_hash": "bace1de41ef448f486b3b06df84b8a21015264535e563d671b601cffbea412e0",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 589,
+  "evaluated_at": "2026-11-04T20:27:19.564870+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested scenarios: the duplicate_charge record is authoritative and contains amount/currency/refund_issued, and the app_crash record describes the Settings crash with a fix build and next steps, sufficient for appropriate answers.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've confirmed the duplicate charge and issued a refund of $49.00 USD"
+          },
+          {
+            "answer_index": 1,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/symptom",
+            "value": "Opening Settings causes the app to crash."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue only: the billing answer covers the duplicate charge and the crash answer covers the Settings crash, matching the two expected issues.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've confirmed the duplicate charge and issued a refund of $49.00 USD"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "app_crash"
+            ]
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "duplicate_charge"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "app_crash"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The refund amount, currency, and issued state are supported by the authoritative record, but 'Please allow your bank's standard processing time' is an unsupported refund-timing claim with no record basis; the rubric explicitly fails this wording even without a number. No unsupported destination is asserted.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please allow your bank's standard processing time for it to appear on your statement."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record",
+            "value": {
+              "amount": 49.0,
+              "currency": "USD",
+              "detail": "Duplicate charge reversed.",
+              "issue_type": "duplicate_charge",
+              "record_id": "BASE-0003:duplicate_charge",
+              "state": "refund_issued"
+            }
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The duplicate-charge answer includes the confirmed refund and a follow-up path; the crash answer includes the available build, installation via the existing channel, and a verification step (reopen Settings), matching the record's next steps.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If you don't see it or have questions, just let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The refund-issued claim matches the record's refund_issued state, and the crash answer describes an available build-level fix with a retest request rather than claiming the user's device is already repaired; no new ticket is demanded for any included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've confirmed the duplicate charge and issued a refund of $49.00 USD, reversing the extra charge."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

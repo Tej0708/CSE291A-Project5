@@ -1,0 +1,150 @@
+{
+  "job_id": "0206a0bc70760ebb9a2a7c44bc64c8796d2845757f67d984cce0b7a2f9a60971",
+  "input_hash": "0206a0bc70760ebb9a2a7c44bc64c8796d2845757f67d984cce0b7a2f9a60971",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 736,
+  "evaluated_at": "2026-11-04T20:37:58.070252+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both supplied records match the requested issues: a password_reset record with a reissued 30-minute link and a subscription_status record showing active status, each with applicable next steps.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/issue_type",
+            "value": "password_reset"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/issue_type",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned password_reset issue (non-working reset link) with the reissued link and validity window; it need not cover subscription_status, which is another helper's issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/expected_issues/1",
+            "value": "password_reset"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Material facts (new link sent to account email, 30-minute validity) are directly supported by the authoritative password_reset record's delivery_channel and valid_for_minutes; no invented timing, destination, or completed user-side repair is asserted.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/detail",
+            "value": "Reset link reissued, valid 30m."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The password_reset answer includes the needed conclusion (reissued link) and the supported next step (use within 30 minutes) plus conditional follow-up; no record fields beyond this are required. The missing subscription_status answer is a bundle-level coverage failure reflected in the overall verdict, not a failure of this answer's own coverage.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password. If the link still doesn't work, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps/0",
+            "value": "Use the reissued reset link within 30 minutes."
+          }
+        ],
+        "omissions": [
+          {
+            "required": "A response addressing the subscription_status issue reported in the request",
+            "missing": "No answer for subscription_status exists in the bundle; the active-status conclusion and refresh step are absent",
+            "requirement_source_path": "/expected_issues/0"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available fix at its actual scope (link reissued, fix_available) without claiming verified repair, and uses conditional follow-up; it does not demand a new ticket or make unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the link still doesn't work, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM criterion assessment with locally derived repository aggregation; not human-verified",
+  "local_aggregation": {
+    "job_id": "0206a0bc70760ebb9a2a7c44bc64c8796d2845757f67d984cce0b7a2f9a60971",
+    "request_id": 736,
+    "original_model_overall": "FAIL",
+    "locally_derived_overall": "PASS",
+    "criterion_labels_and_evidence_unchanged": true,
+    "method": "Existing aggregate(criteria, context), followed by unchanged strict validate; no API call"
+  }
+}

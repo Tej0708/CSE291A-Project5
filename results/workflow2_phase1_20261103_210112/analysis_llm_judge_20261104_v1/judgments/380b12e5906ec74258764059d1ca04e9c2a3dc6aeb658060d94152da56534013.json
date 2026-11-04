@@ -1,0 +1,173 @@
+{
+  "job_id": "380b12e5906ec74258764059d1ca04e9c2a3dc6aeb658060d94152da56534013",
+  "input_hash": "380b12e5906ec74258764059d1ca04e9c2a3dc6aeb658060d94152da56534013",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 143,
+  "evaluated_at": "2026-11-04T20:07:36.022663+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested scenarios: a duplicate-charge record with refund_issued state and an installation_failure record with matching symptom and remediation steps. The installation record is marked non-authoritative but its content fits the request and supports an appropriate answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've confirmed the duplicate charge and issued a refund of $49.00 USD"
+          },
+          {
+            "answer_index": 1,
+            "quote": "clear the installer cache, then re-run setup version 4.2.1"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/symptom",
+            "value": "Software update cannot be installed."
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/next_steps",
+            "value": [
+              "Clear the installer cache.",
+              "Re-run setup version 4.2.1."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the first covers the duplicate charge refund, the second covers the update installation failure. Neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've confirmed the duplicate charge and issued a refund of $49.00 USD"
+          },
+          {
+            "answer_index": 1,
+            "quote": "For the update installation issue, there's a fix available"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "duplicate_charge"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "installation_failure"
+          },
+          {
+            "path": "/user_request",
+            "value": "I appear to have been charged twice. Also, the software update will not install."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The refund amount ($49.00 USD) and issued state are supported by the record, but the answer asserts an unsupported refund destination ('reversed on your account') and an unsupported timing claim ('may take a few days to appear'). The record contains no destination or processing-time fields; per the rubric and U1, unsupported destinations such as 'to your account' and unsupported 'few days' timelines are grounding FAIL.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "which has been reversed on your account"
+          },
+          {
+            "answer_index": 0,
+            "quote": "Depending on your payment provider, it may take a few days to appear on your statement"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/amount",
+            "value": 49.0
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/detail",
+            "value": "Duplicate charge reversed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The duplicate-charge answer includes the refund conclusion and a follow-up step; the installation answer includes the supported remediation steps and a conditional follow-up. Both expected issues are covered in the retained bundle.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If you don't see it reflected, let us know and we can look into it further."
+          },
+          {
+            "answer_index": 1,
+            "quote": "If the update still won't install after these steps, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/next_steps",
+            "value": [
+              "Clear the installer cache.",
+              "Re-run setup version 4.2.1."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The refund issuance claim matches the record's refund_issued state, and the installation answer uses 'a fix available' with conditional follow-up language, consistent with the record's fix_available state. No unsupported whole-case closure or new-ticket demand is present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "issued a refund of $49.00 USD"
+          },
+          {
+            "answer_index": 1,
+            "quote": "there's a fix available: clear the installer cache, then re-run setup version 4.2.1"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

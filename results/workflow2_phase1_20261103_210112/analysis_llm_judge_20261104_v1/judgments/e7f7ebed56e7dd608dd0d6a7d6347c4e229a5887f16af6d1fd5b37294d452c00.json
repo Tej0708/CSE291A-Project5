@@ -1,0 +1,150 @@
+{
+  "job_id": "e7f7ebed56e7dd608dd0d6a7d6347c4e229a5887f16af6d1fd5b37294d452c00",
+  "input_hash": "e7f7ebed56e7dd608dd0d6a7d6347c4e229a5887f16af6d1fd5b37294d452c00",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 410,
+  "evaluated_at": "2026-11-04T20:20:14.224608+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The observed incorrect_invoice record matches the requested scenario (invoice amount looks incorrect) and provides the corrected amount, currency, and state needed for an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your invoice has been corrected and reissued at the right amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/observed_records/incorrect_invoice/record",
+            "value": {
+              "amount": 19.0,
+              "currency": "USD",
+              "detail": "Invoice reissued at correct amount.",
+              "issue_type": "incorrect_invoice",
+              "record_id": "BASE-0004:incorrect_invoice",
+              "state": "corrected"
+            }
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (incorrect_invoice) directly; the app_crash issue is covered by the earlier answer in the same attempt and is not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your invoice has been corrected and reissued at the right amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "app_crash"
+            ]
+          },
+          {
+            "path": "/workflow_context/earlier_answers_in_same_attempt/0/assigned_issue",
+            "value": "app_crash"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "The $19.00 USD amount, the correction, and the reissue are all supported by the authoritative record (amount 19.0, currency USD, state corrected, detail 'Invoice reissued at correct amount'). No refund timing or destination claims are made.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "corrected and reissued at the right amount of $19.00 USD"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the necessary conclusion (invoice corrected and reissued at $19.00 USD) and a supported verification step (review the reissued invoice and report back if anything is off).",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please review the reissued invoice to confirm the amount now looks correct to you. If anything still seems off, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The definite claim that the invoice has been corrected and reissued is supported by the record's state 'corrected' and detail 'Invoice reissued at correct amount.' No unsupported whole-case closure and no demand for a new ticket for an included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your invoice has been corrected and reissued at the right amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

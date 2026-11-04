@@ -1,0 +1,152 @@
+{
+  "job_id": "47b35987295002c080eab6a9cc2cb251f311e91b11cb8a1f076eec788e489b8b",
+  "input_hash": "47b35987295002c080eab6a9cc2cb251f311e91b11cb8a1f076eec788e489b8b",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 692,
+  "evaluated_at": "2026-11-04T20:33:56.716222+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative duplicate_charge record (USD 49.00, refund_issued) fits the reported duplicate-charge request, and the installation_failure record matches the reported installer/unsupported-OS symptom, so the environment provides records adequate for an appropriate response. The corrupted observed duplicate_charge record (491.00, CONTRADICTORY) is a fault-injection artifact, not an environment/request mismatch.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our records show a reversal of the $491.00 USD duplicate charge"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/symptom",
+            "value": "Desktop installer rejects the operating system as unsupported."
+          },
+          {
+            "path": "/user_request",
+            "value": "My latest renewal appears as a duplicate charge on my bank statement. Separately, the desktop installer rejects the update because the operating system version is unsupported."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (duplicate_charge), including the reversal status, the verification step, and follow-up. It does not need to cover installation_failure, which is another helper's issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our records show a reversal of the $491.00 USD duplicate charge, but the entry is unverified and contains conflicting details, so we're confirming it against the authoritative billing ledger before treating it as final."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "duplicate_charge"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The answer asserts a material fact of $491.00 USD, which matches only the corrupted observed record (amount 491.0, state CONTRADICTORY, provenance unverified) and contradicts the original authoritative record (amount 49.0, USD, refund_issued). The reversal itself is supported by the authoritative detail/state, and no unsupported refund timing or destination is asserted, but the wrong amount is an unsupported material factual claim.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "a reversal of the $491.00 USD duplicate charge"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/amount",
+            "value": 49.0
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/observed_records/duplicate_charge/record/amount",
+            "value": 491.0
+          },
+          {
+            "path": "/observed_records/duplicate_charge/record/state",
+            "value": "CONTRADICTORY"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Draft coverage is limited to the assigned issue. The answer gives the needed conclusion (reversal recorded but unverified pending ledger confirmation) and supported next steps (ledger verification, follow-up, customer check without asserting a destination). The installation_failure issue has no retained answer, which is a bundle-level gap driving the overall verdict, not a coverage failure of this draft.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We'll follow up once the ledger check is complete. If you don't see the reversal reflected on your statement after that confirmation, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "duplicate_charge"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          }
+        ],
+        "omissions": [
+          {
+            "required": "An answer for the expected installation_failure issue",
+            "missing": "No retained answer addresses the installation_failure issue; the bundle contains only the duplicate_charge draft",
+            "requirement_source_path": "/expected_issues"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer does not claim verified resolution, does not assert whole-case closure, and does not demand a new ticket for an included issue. It explicitly withholds final treatment of the reversal until ledger verification, which is honest about the contradictory record.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "we're confirming it against the authoritative billing ledger before treating it as final"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/observed_records/duplicate_charge/authoritative",
+            "value": false
+          },
+          {
+            "path": "/observed_records/duplicate_charge/record/provenance",
+            "value": "unverified"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

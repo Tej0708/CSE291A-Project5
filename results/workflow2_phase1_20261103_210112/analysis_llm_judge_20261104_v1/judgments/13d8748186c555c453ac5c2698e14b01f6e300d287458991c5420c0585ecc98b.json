@@ -1,0 +1,154 @@
+{
+  "job_id": "13d8748186c555c453ac5c2698e14b01f6e300d287458991c5420c0585ecc98b",
+  "input_hash": "13d8748186c555c453ac5c2698e14b01f6e300d287458991c5420c0585ecc98b",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 664,
+  "evaluated_at": "2026-11-04T20:37:58.034364+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The login_failure record matches the requested scenario (unable to log in) and supplies an applicable intervention and retry step; the subscription_status record also matches the reported wrong-status symptom, so the environment fits the request.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication node, which should resolve the login issue."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/symptom",
+            "value": "Unable to log in."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/issue_type",
+            "value": "subscription_status"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (login_failure) with the recorded intervention and a retry step; it is not required to cover the other helper's subscription_status issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please try logging in again now. If it still fails after retrying, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "login_failure"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. I cannot log in to my account. My subscription status looks wrong."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "The restart claim is directly supported by the record detail ('Auth node restarted; retry login.'), and 'should resolve' is prospective wording rather than an asserted completed repair; no unsupported timing, destination, or other material facts are invented.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication node, which should resolve the login issue."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "For the assigned login_failure issue, the answer gives the available fix (auth node restart), the supported next step (retry login, matching the record's next_steps), and conditional follow-up. Draft coverage is limited to the assigned issue; however, the bundle retains no answer for the expected subscription_status issue, which drives the run-level verdict.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please try logging in again now. If it still fails after retrying, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps/0",
+            "value": "Retry logging in."
+          },
+          {
+            "path": "/expected_issues/0",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/expected_issues/1",
+            "value": "login_failure"
+          }
+        ],
+        "omissions": [
+          {
+            "required": "A retained answer closing the expected subscription_status issue (active status and refresh step)",
+            "missing": "No answer for subscription_status exists in the answers bundle; only login_failure is answered",
+            "requirement_source_path": "/expected_issues/0"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer uses prospective remediation wording ('should resolve') with a retry request and conditional follow-up, which passes under the prospective/conditional boundary; it does not claim verified repair and does not demand a new ticket for any included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication node, which should resolve the login issue. Please try logging in again now."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM criterion assessment with locally derived repository aggregation; not human-verified",
+  "local_aggregation": {
+    "job_id": "13d8748186c555c453ac5c2698e14b01f6e300d287458991c5420c0585ecc98b",
+    "request_id": 664,
+    "original_model_overall": "FAIL",
+    "locally_derived_overall": "PASS",
+    "criterion_labels_and_evidence_unchanged": true,
+    "method": "Existing aggregate(criteria, context), followed by unchanged strict validate; no API call"
+  }
+}

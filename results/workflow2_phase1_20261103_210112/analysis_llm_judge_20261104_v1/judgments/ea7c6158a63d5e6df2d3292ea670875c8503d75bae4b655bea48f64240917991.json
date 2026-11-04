@@ -1,0 +1,147 @@
+{
+  "job_id": "ea7c6158a63d5e6df2d3292ea670875c8503d75bae4b655bea48f64240917991",
+  "input_hash": "ea7c6158a63d5e6df2d3292ea670875c8503d75bae4b655bea48f64240917991",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 326,
+  "evaluated_at": "2026-11-04T20:15:49.013122+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied duplicate_charge record matches the requested scenario (renewal billed twice) and contains amount, currency, and refund_issued state sufficient for an appropriate billing response. The installation_failure record also matches the described installer/OS symptom, though it is not this helper's assigned issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The duplicate charge has been reversed, and a refund of $49.00 USD has been issued."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record",
+            "value": {
+              "amount": 49.0,
+              "currency": "USD",
+              "detail": "Duplicate charge reversed.",
+              "issue_type": "duplicate_charge",
+              "record_id": "BASE-0027:duplicate_charge",
+              "state": "refund_issued"
+            }
+          },
+          {
+            "path": "/user_request",
+            "value": "My latest renewal appears as a duplicate charge on my bank statement. Separately, the desktop installer rejects the update because the operating system version is unsupported."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (duplicate_charge) directly; the installation_failure issue belongs to another helper and is not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The duplicate charge has been reversed, and a refund of $49.00 USD has been issued."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "duplicate_charge"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The refund amount ($49.00 USD), reversal, and refund_issued state are supported by the authoritative record. However, 'Please allow your bank's standard posting time' is an unsupported bank-processing-time claim; the record contains no timing basis. Per the frozen rubric, unsupported 'bank's standard processing time' wording is a grounding FAIL, and no numeric-deadline or record-based exception applies.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please allow your bank's standard posting time for the refund to appear on your statement."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record",
+            "value": {
+              "amount": 49.0,
+              "currency": "USD",
+              "detail": "Duplicate charge reversed.",
+              "issue_type": "duplicate_charge",
+              "record_id": "BASE-0027:duplicate_charge",
+              "state": "refund_issued"
+            }
+          }
+        ],
+        "omissions": [
+          {
+            "required": "Refund timing must be supported by the record or phrased without inventing processing assumptions",
+            "missing": "No record field supports any posting timeline or bank processing assumption; the answer asserts 'your bank's standard posting time'",
+            "requirement_source_path": "/original_authoritative_records/duplicate_charge/record"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the necessary conclusion (duplicate charge reversed, refund of $49.00 USD issued) and a supported follow-up step (contact us if the duplicate charge still shows after the refund posts). No record field repetition is required.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the duplicate charge still shows after the refund posts, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/amount",
+            "value": 49.0
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The claim that the duplicate charge was reversed and a refund issued matches the record's state (refund_issued) at its actual scope; no unsupported whole-case closure or demand for a new ticket is present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The duplicate charge has been reversed, and a refund of $49.00 USD has been issued."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/detail",
+            "value": "Duplicate charge reversed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

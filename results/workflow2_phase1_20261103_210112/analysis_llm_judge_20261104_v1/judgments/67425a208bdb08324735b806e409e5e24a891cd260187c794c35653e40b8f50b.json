@@ -1,0 +1,189 @@
+{
+  "job_id": "67425a208bdb08324735b806e409e5e24a891cd260187c794c35653e40b8f50b",
+  "input_hash": "67425a208bdb08324735b806e409e5e24a891cd260187c794c35653e40b8f50b",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 595,
+  "evaluated_at": "2026-11-04T20:27:36.436884+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "FAIL",
+        "explanation": "The duplicate_charge record supplied to the helper is corrupted: it is marked CONTRADICTORY/unverified and carries amount 491.00 USD, while the authoritative record states 49.00 USD with refund_issued. This record cannot support an appropriate response to the duplicate-charge request; the app_crash record aligns fine.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our billing record for this is currently contradictory and unverified"
+          },
+          {
+            "answer_index": 0,
+            "quote": "reversal of the $491.00 USD charge"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/observed_records/duplicate_charge/record/state",
+            "value": "CONTRADICTORY"
+          },
+          {
+            "path": "/observed_records/duplicate_charge/record/amount",
+            "value": 491.0
+          },
+          {
+            "path": "/observed_records/duplicate_charge/record/provenance",
+            "value": "unverified"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/amount",
+            "value": 49.0
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the billing answer addresses the duplicate charge and the crash answer addresses the Settings crash. Neither substitutes an unrelated issue, and draft coverage is limited to assigned_issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Thanks for flagging the possible duplicate charge."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "duplicate_charge"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/user_request",
+            "value": "I appear to have been charged twice. Also, the app crashes whenever i open settings."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The duplicate_charge answer asserts a $491.00 USD charge, but the original authoritative record states the amount is 49.00 USD with state refund_issued. The 491.00 figure comes only from the corrupted observed record, and agreement with observed values is not proof of correctness. The app_crash answer's build 7.9.3, installation channel, and retest steps are all supported by the record.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "I can't confirm whether a reversal of the $491.00 USD charge has actually been applied"
+          },
+          {
+            "answer_index": 1,
+            "quote": "The Settings crash has a fix available in build 7.9.3. Please install that build through your existing installation channel, then reopen Settings"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/amount",
+            "value": 49.0
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The app_crash answer includes the available build, installation via the existing channel, and a verification step (reopen Settings, report if it persists). The duplicate_charge answer addresses the issue with an honest status statement and a supported next step (verify against the authoritative ledger and follow up), consistent with the contradictory record the helper received; no record field repetition is required.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists. If it still crashes afterward, let us know."
+          },
+          {
+            "answer_index": 0,
+            "quote": "We're verifying it against the authoritative billing ledger, and we'll follow up with the confirmed outcome."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "app_crash"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The app_crash answer claims a fix is available (matching the record's fix_available state) and requests installation/retest, which is prospective and does not assert observed user-side repair. The billing answer makes no unsupported closure claim and no new ticket is demanded for either included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          },
+          {
+            "answer_index": 0,
+            "quote": "we'll follow up with the confirmed outcome"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/user_request",
+            "value": "I appear to have been charged twice. Also, the app crashes whenever i open settings."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "DATA_ISSUE",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

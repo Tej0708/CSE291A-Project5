@@ -1,0 +1,167 @@
+{
+  "job_id": "20737620e57a887667a3ff5406f244196053eb9dbf886e2de87a10085d629aff",
+  "input_hash": "20737620e57a887667a3ff5406f244196053eb9dbf886e2de87a10085d629aff",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 684,
+  "evaluated_at": "2026-11-04T20:37:58.045986+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The observed incorrect_invoice record matches the authoritative record (amount 19.0 USD, state corrected, reissued) and directly fits the customer's reported invoice-amount problem, providing sufficient evidence for an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/observed_records/incorrect_invoice/record",
+            "value": {
+              "amount": 19.0,
+              "currency": "USD",
+              "detail": "Invoice reissued at correct amount.",
+              "issue_type": "incorrect_invoice",
+              "record_id": "BASE-0015:incorrect_invoice",
+              "state": "corrected"
+            }
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record",
+            "value": {
+              "amount": 19.0,
+              "currency": "USD",
+              "detail": "Invoice reissued at correct amount.",
+              "issue_type": "incorrect_invoice",
+              "record_id": "BASE-0015:incorrect_invoice",
+              "state": "corrected"
+            }
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (incorrect_invoice) directly; it is not required to cover password_reset, which belongs to another helper's scope.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/user_request",
+            "value": "The invoice amount looks incorrect. Also, the password reset link does not work."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "The asserted correction, reissue, amount ($19.00) and currency (USD) are all supported by the authoritative record; no refund timing or destination is claimed and no material facts are invented.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "corrected and reissued at the accurate amount of $19.00 USD"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "For this draft, coverage is limited to the assigned issue: the answer gives the needed conclusion (invoice corrected and reissued at $19.00 USD) plus a verification step and follow-up path. The bundle-level gap (no retained answer for expected issue password_reset) is recorded below and drives the overall run verdict, not this draft's assigned-issue coverage.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please review the reissued invoice to confirm the amount now looks right to you. If anything still appears off, let us know and we'll take another look."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "password_reset"
+            ]
+          }
+        ],
+        "omissions": [
+          {
+            "required": "A retained answer resolving the expected password_reset issue (non-working reset link)",
+            "missing": "The bundle contains no answer addressing password_reset; only incorrect_invoice is retained",
+            "requirement_source_path": "/expected_issues/1"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The definite claim that the invoice has been corrected and reissued is supported by the record's state 'corrected' and detail 'Invoice reissued at correct amount.' The claim stays at its actual scope, asks the customer to verify, and does not demand a new ticket or make unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM criterion assessment with locally derived repository aggregation; not human-verified",
+  "local_aggregation": {
+    "job_id": "20737620e57a887667a3ff5406f244196053eb9dbf886e2de87a10085d629aff",
+    "request_id": 684,
+    "original_model_overall": "FAIL",
+    "locally_derived_overall": "PASS",
+    "criterion_labels_and_evidence_unchanged": true,
+    "method": "Existing aggregate(criteria, context), followed by unchanged strict validate; no API call"
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "job_id": "8d7a7963d74bcdfc8ed40653a3f8a0def93a0df6cb84a8399a002eb6fcbd97f9",
+  "input_hash": "8d7a7963d74bcdfc8ed40653a3f8a0def93a0df6cb84a8399a002eb6fcbd97f9",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 215,
+  "evaluated_at": "2026-11-04T20:10:00.922527+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative subscription_status record matches the customer's reported wrong subscription status and provides the active state, refreshed display, and a next step sufficient for an appropriate answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your subscription is confirmed active through the current billing cycle"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. I cannot log in to my account. My subscription status looks wrong."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (subscription_status) directly; login_failure is another helper's issue and not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your subscription is confirmed active through the current billing cycle, and the account status display has been refreshed to show \"active.\""
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Active status through the current billing cycle, the refreshed display showing \"active,\" and the refresh instruction are all directly supported by the authoritative record; no refund timing/destination or invented facts are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the account status display has been refreshed to show \"active.\" Please refresh your account page to see the updated status."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/displayed_status",
+            "value": "active"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the needed conclusion (active through the current billing cycle) and the supported next step (refresh the account page, follow up if still wrong), matching the record's next_steps.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the updated status. If it still displays incorrectly after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The claim that the display was refreshed is a supported completed intervention recorded in the authoritative record; no unsupported whole-case closure or new-ticket demand is made, and the login issue is not excluded from the workflow.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the account status display has been refreshed to show \"active.\""
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          },
+          {
+            "path": "/workflow_context/earlier_answers_in_same_attempt/0/answer",
+            "value": "We've restarted the authentication service, which should resolve the login issue. Please try logging in again now. If you still can't get in after retrying, let us know."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

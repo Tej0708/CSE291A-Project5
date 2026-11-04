@@ -1,0 +1,172 @@
+{
+  "job_id": "6c8883c2bbdc2d3520b94179a459a9fa6e425a76c96387c09185bf15fddc244b",
+  "input_hash": "6c8883c2bbdc2d3520b94179a459a9fa6e425a76c96387c09185bf15fddc244b",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 10,
+  "evaluated_at": "2026-11-04T19:59:05.722500+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested scenario: an app_crash record describing the Settings crash with a fixed build and next steps, and a charge_after_cancellation record with amount, currency, and refund_issued state. The observed records agree with the original authoritative records, so the environment supports appropriate answers for both issues.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/symptom",
+            "value": "Opening Settings causes the app to crash."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. I canceled my subscription but was charged afterward."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the app_crash answer addresses the Settings crash fix, and the charge_after_cancellation answer addresses the post-cancellation refund. Neither substitutes an unrelated issue, and draft coverage is limited to assigned_issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The post-cancellation charge of $29.99 USD has been refunded."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "charge_after_cancellation"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Answer 0's build 7.9.3 fix availability and installation/retest steps are directly supported by the app_crash record. Answer 1's $29.99 USD amount and refunded state match the billing record. No refund timing is asserted, and 'check your payment account to confirm the refund appears' is generic checking that does not assert a specific refund destination, which is allowed. No invented material facts.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The post-cancellation charge of $29.99 USD has been refunded. Please check your payment account to confirm the refund appears."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/amount",
+            "value": 29.99
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The bundle covers both expected issues with the needed conclusions and next steps: the app_crash answer gives the available build, installation via the existing channel, and reopening Settings to verify; the billing answer reports the refund and asks the customer to check their payment account with a follow-up path. No expected issue is missing and execution completed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If it still crashes afterward, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "If it doesn't show up or you have questions, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "charge_after_cancellation",
+              "app_crash"
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "Answer 0 uses prospective/conditional wording ('fix available', 'see if the crash persists', 'if it still crashes afterward, let us know') and does not claim the user's device is already repaired; a supported build-level fix claim may pass without observed user confirmation. Answer 1 reports the recorded refund_issued state at its actual scope and requests generic customer checking without unsupported closure claims. Neither answer demands a new ticket for an included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has a fix available in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please check your payment account to confirm the refund appears."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

@@ -1,0 +1,171 @@
+{
+  "job_id": "e41388c44be4600174b971338b0c30b989c825f4352ff132c229ec63bf0deb5d",
+  "input_hash": "e41388c44be4600174b971338b0c30b989c825f4352ff132c229ec63bf0deb5d",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 219,
+  "evaluated_at": "2026-11-04T20:10:09.108931+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested scenarios: the subscription record covers a paid activation showing stale trial data, and the login record covers a phone sign-in loop caused by an expired server-side session, each with applicable next steps.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/issue_type",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Paid-plan activation is confirmed. The account page had stale trial-plan data; the display cache has been refreshed."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/symptom",
+            "value": "Phone login returns immediately to the sign-in page."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Diagnostic identified an expired server-side session. The session was invalidated to permit a fresh sign-in."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the subscription answer explains the stale trial display and refresh step, and the login answer explains the invalidated session and re-sign-in steps.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your paid-plan activation is confirmed, and your account is active on the paid plan — the trial display was stale data that has now been corrected."
+          },
+          {
+            "answer_index": 1,
+            "quote": "We found that an expired server-side session was causing the sign-in loop, and it has been invalidated so a fresh sign-in can work."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "login_failure"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Material claims are supported: paid activation confirmed and display corrected per the subscription record; expired session identified and invalidated per the login record. No refund timing/destination claims, no invented facts.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the trial display was stale data that has now been corrected"
+          },
+          {
+            "answer_index": 1,
+            "quote": "an expired server-side session was causing the sign-in loop, and it has been invalidated"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/current_plan",
+            "value": "paid"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Diagnostic identified an expired server-side session. The session was invalidated to permit a fresh sign-in."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Both expected issues are covered with conclusions and next steps: refresh the account page for the display issue, and close/reopen the app then sign in again for login, with conditional follow-up if problems persist. Execution completed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan reflected. If it still shows the trial after refreshing, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please close and reopen the app on your phone, then sign in again to create a new session. If you're still returned to the sign-in page after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to see the paid plan."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps",
+            "value": [
+              "Close and reopen the app on your phone.",
+              "Sign in again to create a new session."
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The login answer reports the recorded intervention (session invalidated) at its actual scope and requests a retry, without claiming verified repair or 'fixed on our end'. The subscription answer reflects the recorded corrected display state. No new-ticket demand and no unsupported whole-case closure.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "it has been invalidated so a fresh sign-in can work. Please close and reopen the app on your phone, then sign in again to create a new session."
+          },
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan reflected."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

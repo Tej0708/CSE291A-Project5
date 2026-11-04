@@ -1,0 +1,152 @@
+{
+  "job_id": "c9c535dc3f66afe49bca2341f7bcbc01971a268a7e39a82c0a5bfccfbc1fa4b0",
+  "input_hash": "c9c535dc3f66afe49bca2341f7bcbc01971a268a7e39a82c0a5bfccfbc1fa4b0",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 31,
+  "evaluated_at": "2026-11-04T20:02:09.703529+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied sync_failure record matches the customer's reported symptom (files not syncing between devices), provides the intervention state (fix_available), and concrete next steps that the answer can faithfully relay. The incorrect_invoice record is also present for the other requested issue, so the environment fits the full request.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please re-enable sync on your device, then check whether your files sync between devices."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/issue_type",
+            "value": "sync_failure"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. My files are not syncing between devices. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (sync_failure) directly with remediation and verification steps. It is not required to cover incorrect_invoice, which belongs to another helper.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end — a fix is available."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "sync_failure"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "sync_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Every material claim is supported by the record: the queue flush matches 'Sync queue flushed', 'a fix is available' matches state 'fix_available', and the re-enable/check steps match the recorded next_steps. No refund timing/destination claims, no invented facts, and no unsupported user-side repair assertion.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end — a fix is available. Please re-enable sync on your device, then check whether your files sync between devices."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/detail",
+            "value": "Sync queue flushed; re-enable sync."
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the necessary conclusion (server-side queue flush performed, fix available) and the supported remediation and verification steps (re-enable sync, check cross-device syncing, follow up if it fails). Draft coverage is limited to the assigned issue; incorrect_invoice is not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please re-enable sync on your device, then check whether your files sync between devices. If it still doesn't work after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "sync_failure"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available fix at its actual scope ('a fix is available') rather than claiming the user's sync is definitely repaired, and it preserves the need for user-side retest with conditional follow-up. It does not demand a new ticket or make unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "a fix is available. Please re-enable sync on your device, then check whether your files sync between devices. If it still doesn't work after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

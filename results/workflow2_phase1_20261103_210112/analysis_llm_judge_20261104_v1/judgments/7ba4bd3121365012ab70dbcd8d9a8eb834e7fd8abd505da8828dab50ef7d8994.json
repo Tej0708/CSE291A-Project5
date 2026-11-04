@@ -1,0 +1,135 @@
+{
+  "job_id": "7ba4bd3121365012ab70dbcd8d9a8eb834e7fd8abd505da8828dab50ef7d8994",
+  "input_hash": "7ba4bd3121365012ab70dbcd8d9a8eb834e7fd8abd505da8828dab50ef7d8994",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 195,
+  "evaluated_at": "2026-11-04T20:09:15.397970+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied login_failure record matches the requested scenario (unable to log in), reports an available fix with a concrete next step, and provides enough evidence for an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication service, which should resolve the login issue."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/symptom",
+            "value": "Unable to log in."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps",
+            "value": [
+              "Retry logging in."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (login_failure) directly; subscription_status is a separate helper's issue and not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please try logging in again now. If you still can't log in after retrying, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "login_failure"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "The restart claim is supported by the record ('Auth node restarted; retry login.'), and 'should resolve' is prospective wording rather than an unsupported definite repair claim. No refund timing/destination or invented material facts are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication service, which should resolve the login issue."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the supported remediation (retry login) and a verification/follow-up step (report back if retry fails), matching the record's next_steps. It need not repeat another helper's subscription_status work.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please try logging in again now. If you still can't log in after retrying, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps",
+            "value": [
+              "Retry logging in."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "Uses prospective language ('should resolve') with a retry request and conditional follow-up, consistent with a restart-only record; no definite unsupported repair claim and no demand for a new ticket.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "which should resolve the login issue. Please try logging in again now. If you still can't log in after retrying, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

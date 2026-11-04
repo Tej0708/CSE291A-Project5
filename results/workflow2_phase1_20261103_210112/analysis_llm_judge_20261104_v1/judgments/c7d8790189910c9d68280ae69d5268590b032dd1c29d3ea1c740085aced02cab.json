@@ -1,0 +1,185 @@
+{
+  "job_id": "c7d8790189910c9d68280ae69d5268590b032dd1c29d3ea1c740085aced02cab",
+  "input_hash": "c7d8790189910c9d68280ae69d5268590b032dd1c29d3ea1c740085aced02cab",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 417,
+  "evaluated_at": "2026-11-04T20:20:22.665094+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested issues: an app_crash record describing the Settings crash with a fix in build 7.9.3, and an incorrect_invoice record showing a corrected $19.00 USD invoice. These provide sufficient evidence for appropriate answers.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the correct amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/symptom",
+            "value": "Opening Settings causes the app to crash."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the app_crash answer addresses the Settings crash remediation, and the incorrect_invoice answer addresses the invoice correction. Neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install build 7.9.3 through your existing installation channel, then reopen Settings to see if the crash persists."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please review the updated invoice, and if the amount still looks wrong, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts are supported by the authoritative records: build 7.9.3 fix availability, installation channel, and reopen-and-check steps match the app_crash record; the $19.00 USD corrected/reissued invoice matches the incorrect_invoice record. No refund timing or destination is asserted, and no unsupported completed user-side repair is claimed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3. Please install build 7.9.3 through your existing installation channel, then reopen Settings to see if the crash persists."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the correct amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/currency",
+            "value": "USD"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The bundle covers both expected issues. The app_crash answer includes the available build, installation via the existing channel, and reopening Settings to verify; the incorrect_invoice answer includes the corrected amount and a follow-up step. No necessary conclusion or remediation/verification step is omitted.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install build 7.9.3 through your existing installation channel, then reopen Settings to see if the crash persists. If it still crashes after updating, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the correct amount of $19.00 USD. Please review the updated invoice, and if the amount still looks wrong, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "app_crash"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The app_crash answer describes an available fix at its actual scope and preserves the need for retest, without claiming the user's device is already repaired. The invoice answer reports the recorded corrected state. No new-ticket demand for an included issue and no unsupported whole-case closure.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the correct amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

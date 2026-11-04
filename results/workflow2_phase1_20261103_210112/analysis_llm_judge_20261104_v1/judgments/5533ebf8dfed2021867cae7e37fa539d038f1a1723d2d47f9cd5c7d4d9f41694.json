@@ -1,0 +1,157 @@
+{
+  "job_id": "5533ebf8dfed2021867cae7e37fa539d038f1a1723d2d47f9cd5c7d4d9f41694",
+  "input_hash": "5533ebf8dfed2021867cae7e37fa539d038f1a1723d2d47f9cd5c7d4d9f41694",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 740,
+  "evaluated_at": "2026-11-04T20:38:31.303956+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative subscription_status record matches the requested scenario (paid plan showing as trial) and provides the confirmed plan state, corrected display sync, and a refresh next step sufficient for an appropriate answer. The login_failure record content also matches the reported phone sign-in symptom, so no scenario mismatch is established.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your paid-plan activation is confirmed, and your account is active on the paid plan"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/current_plan",
+            "value": "paid"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/issue_type",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to see the paid plan."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/symptom",
+            "value": "Phone login returns immediately to the sign-in page."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (subscription_status) directly. Omitting login_failure is allowed because draft coverage is limited to the assigned issue and that is another helper's issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the trial display was stale data that has now been corrected"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material claims are supported by the authoritative record: paid-plan activation confirmed, account active, stale trial display, and the display cache refreshed/corrected. No refund timing or destination claims are present, and no invented facts appear. The refresh instruction matches the record's next step.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the trial display was stale data that has now been corrected. Please refresh your account page to see the paid plan reflected."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Paid-plan activation is confirmed. The account page had stale trial-plan data; the display cache has been refreshed."
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/displayed_status",
+            "value": "active"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to see the paid plan."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the necessary conclusion (paid plan confirmed and active, trial display was stale) and the supported remediation/verification step (refresh the account page, with conditional follow-up if the trial still shows). No record fields need to be repeated verbatim.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan reflected. If it still shows the trial after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to see the paid plan."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/current_plan",
+            "value": "paid"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The definite claim that the display has been corrected is supported by the record, which explicitly states the display cache has been refreshed and display_sync_status is corrected; the success scope itself is recorded, so absence of user confirmation is not a failure. The answer preserves the need for the user to refresh and recheck, and does not demand a new ticket or make unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the trial display was stale data that has now been corrected"
+          },
+          {
+            "answer_index": 0,
+            "quote": "If it still shows the trial after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Paid-plan activation is confirmed. The account page had stale trial-plan data; the display cache has been refreshed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

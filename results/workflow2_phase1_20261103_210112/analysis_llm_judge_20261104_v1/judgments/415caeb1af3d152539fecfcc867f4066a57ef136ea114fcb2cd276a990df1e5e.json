@@ -1,0 +1,136 @@
+{
+  "job_id": "415caeb1af3d152539fecfcc867f4066a57ef136ea114fcb2cd276a990df1e5e",
+  "input_hash": "415caeb1af3d152539fecfcc867f4066a57ef136ea114fcb2cd276a990df1e5e",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 735,
+  "evaluated_at": "2026-11-04T20:37:01.218693+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The password_reset record matches the requested scenario (non-working reset link) with a reissued link, delivery channel, validity window and next steps; the subscription_status record also fits the second reported issue, so the environment supports an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/issue_type",
+            "value": "password_reset"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/detail",
+            "value": "Reset link reissued, valid 30m."
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/issue_type",
+            "value": "subscription_status"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (password_reset) directly; the subscription_status issue belongs to another helper and is not required in this draft.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes. Please use it within that window to reset your password."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/expected_issues/0",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/expected_issues/1",
+            "value": "password_reset"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts are supported by the authoritative record: reissued link, delivery via account email, and 30-minute validity. No refund timing/destination or invented guarantees are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the needed conclusion (a new link was issued) and the supported next steps (use within 30 minutes, follow up if it still fails), matching the record's next_steps without requiring every record field to be repeated.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password. If the link still doesn't work after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps/0",
+            "value": "Use the reissued reset link within 30 minutes."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available fix (reissued link) at its actual scope and preserves the need for the user to retest, without claiming verified repair; it keeps assigned-issue scope and does not demand a new ticket.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the link still doesn't work after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

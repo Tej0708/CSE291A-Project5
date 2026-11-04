@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-b2ddce3448bd3ad1",
+  "created": 1793823290,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"Both records match the requested scenarios: the billing record documents a $49.00 USD refund_issued for the duplicate charge, and the installation record matches the reported unsupported-OS installer symptom with applicable next steps.\",\"answer_excerpts\":[],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/state\",\"value\":\"refund_issued\"},{\"path\":\"/original_authoritative_records/duplicate_charge/record/amount\",\"value\":49.0},{\"path\":\"/original_authoritative_records/installation_failure/record/symptom\",\"value\":\"Desktop installer rejects the operating system as unsupported.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"Each answer addresses its assigned issue only: the billing answer covers the duplicate charge and the installation answer covers the OS-unsupported installer failure, without substituting unrelated issues.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"The duplicate renewal charge has been reversed, and a refund of $49.00 USD has been issued\"},{\"answer_index\":1,\"quote\":\"The compatibility check confirms your operating system is unsupported by the requested update\"}],\"source_fields\":[{\"path\":\"/answers/0/assigned_issue\",\"value\":\"duplicate_charge\"},{\"path\":\"/answers/1/assigned_issue\",\"value\":\"installation_failure\"},{\"path\":\"/expected_issues\",\"value\":[\"duplicate_charge\",\"installation_failure\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"FAIL\",\"explanation\":\"The duplicate-charge answer asserts an unsupported refund destination ('issued to your account') and unsupported timing ('your bank's standard processing time'); the record contains no destination or timing basis. The installation answer's facts are supported by the record, including the honest statement that supported OS versions were not provided.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"a refund of $49.00 USD has been issued to your account\"},{\"answer_index\":0,\"quote\":\"Please allow your bank's standard processing time for the refund to appear on your statement.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record\",\"value\":{\"amount\":49.0,\"currency\":\"USD\",\"detail\":\"Duplicate charge reversed.\",\"issue_type\":\"duplicate_charge\",\"record_id\":\"BASE-0027:duplicate_charge\",\"state\":\"refund_issued\"}},{\"path\":\"/original_authoritative_records/installation_failure/record/supported_os_versions\",\"value\":\"not_provided\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"The duplicate-charge answer gives the needed conclusion (charge reversed, refund issued) and a follow-up step. The installation answer gives the conclusion (OS unsupported, fix available), both documented remediation steps, and a retry/verification path; it does not need to repeat record_id or every field.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If you don't see it reflected after that, let us know and we can look into it further.\"},{\"answer_index\":1,\"quote\":\"1. Check the update's requirements and use an operating system supported by that update.\\n2. Retry the installation once the OS requirement is met.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/installation_failure/record/next_steps\",\"value\":[\"Check the update requirements and use an operating system supported by that update.\",\"Retry installation after the operating system requirement is met.\"]},{\"path\":\"/expected_issues\",\"value\":[\"duplicate_charge\",\"installation_failure\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"The billing answer's completed-action claims (charge reversed, refund issued) are supported by the record's refund_issued state. The installation answer uses supported 'fix is available' language without claiming verified user-side repair, and does not demand a new ticket for any included issue.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"The duplicate renewal charge has been reversed\"},{\"answer_index\":1,\"quote\":\"a fix is available\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/state\",\"value\":\"refund_issued\"},{\"path\":\"/original_authoritative_records/installation_failure/record/state\",\"value\":\"fix_available\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"FAIL\",\"human_followup_needed\":true}",
+        "role": "assistant",
+        "reasoning_content": "Two answers. Duplicate charge: refund $49 USD issued — supported (amount, currency, refund_issued). But \"issued to your account\" — unsupported destination → grounding FAIL per U1. \"Please allow your bank's standard processing time\" — unsupported refund timing → FAIL. So duplicate_charge answer grounding FAIL.\n\nRelevance: addresses duplicate charge — PASS. Coverage: includes conclusion (refund issued) and next steps — PASS. Status_responsibility: claims refund issued — supported by record (refund_issued). \"has been reversed\" — supported. So status PASS.\n\nInstallation_failure answer: matches record. \"a fix is available\" — supported (fix_available). Steps match next_steps. Honest about supported_os_versions not provided. Relevance PASS, grounding PASS, coverage PASS (conclusion + remediation + verification retry + follow-up). Status: \"a fix is available\" — supported; doesn't claim definite repair. PASS.\n\nRecord alignment: records fit requests. Duplicate charge record supports refund; installation record matches symptom. PASS.\n\nOverall: answer criteria FAIL (grounding) → FAIL. Human follow-up true.",
+        "provider_specific_fields": {
+          "reasoning": "Two answers. Duplicate charge: refund $49 USD issued — supported (amount, currency, refund_issued). But \"issued to your account\" — unsupported destination → grounding FAIL per U1. \"Please allow your bank's standard processing time\" — unsupported refund timing → FAIL. So duplicate_charge answer grounding FAIL.\n\nRelevance: addresses duplicate charge — PASS. Coverage: includes conclusion (refund issued) and next steps — PASS. Status_responsibility: claims refund issued — supported by record (refund_issued). \"has been reversed\" — supported. So status PASS.\n\nInstallation_failure answer: matches record. \"a fix is available\" — supported (fix_available). Steps match next_steps. Honest about supported_os_versions not provided. Relevance PASS, grounding PASS, coverage PASS (conclusion + remediation + verification retry + follow-up). Status: \"a fix is available\" — supported; doesn't claim definite repair. PASS.\n\nRecord alignment: records fit requests. Duplicate charge record supports refund; installation record matches symptom. PASS.\n\nOverall: answer criteria FAIL (grounding) → FAIL. Human follow-up true."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1114,
+    "prompt_tokens": 4318,
+    "total_tokens": 5432,
+    "completion_tokens_details": {
+      "reasoning_tokens": 225
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}

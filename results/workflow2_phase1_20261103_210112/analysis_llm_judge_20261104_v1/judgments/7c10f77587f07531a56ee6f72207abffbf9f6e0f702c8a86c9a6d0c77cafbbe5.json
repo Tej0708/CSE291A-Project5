@@ -1,0 +1,148 @@
+{
+  "job_id": "7c10f77587f07531a56ee6f72207abffbf9f6e0f702c8a86c9a6d0c77cafbbe5",
+  "input_hash": "7c10f77587f07531a56ee6f72207abffbf9f6e0f702c8a86c9a6d0c77cafbbe5",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 491,
+  "evaluated_at": "2026-11-04T20:24:08.287247+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative billing record matches the requested scenario (post-cancellation charge with refund_issued state, $29.99 USD) and is sufficient to support an appropriate answer; the corrupted observed record does not create an environment mismatch because the clean reference record fits the request.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/amount",
+            "value": 29.99
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/user_request",
+            "value": "I canceled my subscription but was charged afterward. Also, i cannot log in to my account."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (charge_after_cancellation) directly; the login_failure issue belongs to another helper and is not required in this draft.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We see a record of a $300.90 USD post-cancellation charge marked as refunded"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "charge_after_cancellation"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "charge_after_cancellation",
+              "login_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The answer asserts a $300.90 USD charge and states the refund cannot be confirmed, but the original authoritative record shows a $29.99 USD charge with state refund_issued. The material amount and the refund status are taken from the corrupted observed record (300.9, CONTRADICTORY, unverified) rather than the clean reference facts; agreement with observed values is not proof of correctness.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We see a record of a $300.90 USD post-cancellation charge marked as refunded, but the record is contradictory and unverified, so we can't confirm the refund was actually issued."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/amount",
+            "value": 29.99
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/observed_records/charge_after_cancellation/record/amount",
+            "value": 300.9
+          },
+          {
+            "path": "/observed_records/charge_after_cancellation/record/state",
+            "value": "CONTRADICTORY"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "FAIL",
+        "explanation": "The assigned issue's needed conclusion — that a $29.99 USD post-cancellation refund was issued per the authoritative record — is omitted. The answer defers to an unverified ledger check and requests the customer's bank statement instead of reporting the supported refund outcome. Draft coverage is limited to charge_after_cancellation, so the absent login_failure answer is not a coverage failure for this helper draft.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We need to verify this against the authoritative billing ledger before confirming any outcome."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/detail",
+            "value": "Post-cancel charge refunded."
+          }
+        ],
+        "omissions": [
+          {
+            "required": "Report the supported conclusion that the post-cancellation charge of $29.99 USD was refunded (state refund_issued)",
+            "missing": "No confirmation of the authoritative refund outcome; the answer instead says the refund cannot be confirmed and defers verification",
+            "requirement_source_path": "/original_authoritative_records/charge_after_cancellation/record"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer keeps the assigned-issue scope, does not demand a new ticket for an included issue, and makes no unsupported whole-case closure or definite repair claim; asking the customer for transaction details is an allowed follow-up, though the underlying refund-status assertion is penalized under grounding.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If you have a bank or card statement showing the charge, please share the transaction date and reference so we can complete the verification."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "charge_after_cancellation"
+          },
+          {
+            "path": "/user_request",
+            "value": "I canceled my subscription but was charged afterward. Also, i cannot log in to my account."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

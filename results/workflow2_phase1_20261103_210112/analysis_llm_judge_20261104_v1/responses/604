@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-9f578b90f2f584c4",
+  "created": 1793824065,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"Both records match the requested scenarios: a duplicate-charge record with refund_issued state and amount/currency, and an app_crash record describing the Settings crash with a fixed build and next steps. These provide sufficient evidence for appropriate answers.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"We've confirmed the duplicate charge and issued a refund of $49.00 USD\"},{\"answer_index\":1,\"quote\":\"The Settings crash has a fix available in build 7.9.3.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/state\",\"value\":\"refund_issued\"},{\"path\":\"/original_authoritative_records/app_crash/record/symptom\",\"value\":\"Opening Settings causes the app to crash.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"Each answer addresses its assigned issue only: the billing answer covers the duplicate charge and the crash answer covers the Settings crash, matching the two expected issues in the request.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"We've confirmed the duplicate charge and issued a refund of $49.00 USD, which reverses the extra charge.\"},{\"answer_index\":1,\"quote\":\"The Settings crash has a fix available in build 7.9.3.\"}],\"source_fields\":[{\"path\":\"/expected_issues\",\"value\":[\"duplicate_charge\",\"app_crash\"]},{\"path\":\"/user_request\",\"value\":\"I appear to have been charged twice. Also, the app crashes whenever i open settings.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"PASS\",\"explanation\":\"The refund amount ($49.00 USD) and refund_issued state are supported by the authoritative record. No refund timing or specific destination is asserted; 'check your payment account to verify the refund appears' is generic checking without asserting a destination, which is allowed. The build 7.9.3 fix and installation/retest steps match the app_crash record exactly.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"issued a refund of $49.00 USD\"},{\"answer_index\":0,\"quote\":\"Please check your payment account to verify the refund appears.\"},{\"answer_index\":1,\"quote\":\"Please install that build through your existing installation channel, then reopen Settings to see if the crash persists.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/amount\",\"value\":49.0},{\"path\":\"/original_authoritative_records/duplicate_charge/record/currency\",\"value\":\"USD\"},{\"path\":\"/original_authoritative_records/app_crash/record/fixed_build\",\"value\":\"7.9.3\"},{\"path\":\"/original_authoritative_records/app_crash/record/next_steps\",\"value\":[\"Install build 7.9.3 using your existing installation channel.\",\"Reopen Settings and check whether the crash persists.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"The duplicate-charge answer includes the needed conclusion (refund issued) and a verification/follow-up step. The crash answer includes the available build, installation via the existing channel, and reopening Settings to verify, matching the record's next steps. Both expected issues are covered; no record fields need to be repeated verbatim.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If it doesn't show up or you have questions, let us know.\"},{\"answer_index\":1,\"quote\":\"Please install that build through your existing installation channel, then reopen Settings to see if the crash persists. If it still crashes afterward, let us know.\"}],\"source_fields\":[{\"path\":\"/expected_issues\",\"value\":[\"duplicate_charge\",\"app_crash\"]},{\"path\":\"/original_authoritative_records/app_crash/record/next_steps\",\"value\":[\"Install build 7.9.3 using your existing installation channel.\",\"Reopen Settings and check whether the crash persists.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"The billing answer reports the recorded refund_issued state at its actual scope. The crash answer describes an available fix in build 7.9.3 (supported by the record's fix_available state) and asks the user to install and retest, making no unsupported claim that the user's device is already repaired. No new ticket is demanded for any included issue.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"issued a refund of $49.00 USD, which reverses the extra charge\"},{\"answer_index\":1,\"quote\":\"The Settings crash has a fix available in build 7.9.3.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/duplicate_charge/record/state\",\"value\":\"refund_issued\"},{\"path\":\"/original_authoritative_records/app_crash/record/state\",\"value\":\"fix_available\"},{\"path\":\"/original_authoritative_records/app_crash/record/user_confirmation\",\"value\":\"not_observed\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"PASS\",\"human_followup_needed\":false}",
+        "role": "assistant",
+        "reasoning_content": "Check answers.\n\nDuplicate charge answer: refund $49.00 USD issued — supported by record (amount 49.0, USD, refund_issued). Destination: \"check your payment account to verify the refund appears\" — generic checking, no asserted destination. Per BASE-0006/0036/0040, generic-check PASS. No timing claims. Coverage: conclusion + next step. PASS.\n\nApp crash answer: fix available in build 7.9.3 — record says \"Settings crash patched in build 7.9.3\", state fix_available. \"Fix available in build 7.9.3\" — supported. Install via existing channel, reopen Settings — matches next_steps. Conditional follow-up. PASS per BASE-0029/0032 style.\n\nRecord alignment: records fit requests. app_crash record authoritative:false but status ok, matches scenario. duplicate_charge authoritative true. Alignment PASS.\n\nOverall PASS, human_followup_needed false.",
+        "provider_specific_fields": {
+          "reasoning": "Check answers.\n\nDuplicate charge answer: refund $49.00 USD issued — supported by record (amount 49.0, USD, refund_issued). Destination: \"check your payment account to verify the refund appears\" — generic checking, no asserted destination. Per BASE-0006/0036/0040, generic-check PASS. No timing claims. Coverage: conclusion + next step. PASS.\n\nApp crash answer: fix available in build 7.9.3 — record says \"Settings crash patched in build 7.9.3\", state fix_available. \"Fix available in build 7.9.3\" — supported. Install via existing channel, reopen Settings — matches next_steps. Conditional follow-up. PASS per BASE-0029/0032 style.\n\nRecord alignment: records fit requests. app_crash record authoritative:false but status ok, matches scenario. duplicate_charge authoritative true. Alignment PASS.\n\nOverall PASS, human_followup_needed false."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1245,
+    "prompt_tokens": 4248,
+    "total_tokens": 5493,
+    "completion_tokens_details": {
+      "reasoning_tokens": 197
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}
