@@ -1,0 +1,140 @@
+{
+  "job_id": "98bd3ea9889a5cfc3bbd543674688e085919489780baa495958ef5a9e55e83e7",
+  "input_hash": "98bd3ea9889a5cfc3bbd543674688e085919489780baa495958ef5a9e55e83e7",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 37,
+  "evaluated_at": "2026-11-04T20:02:24.463514+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied sync_failure record matches the requested sync problem and provides remediation and verification steps sufficient for an appropriate answer; the incorrect_invoice authoritative record is also present for the other expected issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please re-enable sync on your device, then check whether your files now sync between devices."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/issue_type",
+            "value": "sync_failure"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. My files are not syncing between devices. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (sync_failure) directly; the invoice issue belongs to another helper and is not required in this draft.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end. Please re-enable sync on your device, then check whether your files now sync between devices."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "sync_failure"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "sync_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "The completed intervention claim (queue flushed) is supported by the record detail, and the user-side steps match the record's next_steps. No unsupported repair claim, refund timing, or destination is asserted.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/detail",
+            "value": "Sync queue flushed; re-enable sync."
+          },
+          {
+            "path": "/observed_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the necessary remediation step (re-enable sync) and a verification step (check whether files sync), with a conditional follow-up path; draft coverage is correctly limited to the assigned issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please re-enable sync on your device, then check whether your files now sync between devices. If it still doesn't work after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes a supported completed intervention (queue flush) at its actual scope and preserves the need for user-side retest; it does not claim the sync problem is definitely fixed, and it does not demand a new ticket.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end. Please re-enable sync on your device, then check whether your files now sync between devices."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

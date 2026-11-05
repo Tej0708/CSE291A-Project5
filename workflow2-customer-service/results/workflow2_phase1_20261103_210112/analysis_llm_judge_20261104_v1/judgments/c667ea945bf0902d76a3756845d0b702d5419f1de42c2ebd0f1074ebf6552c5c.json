@@ -1,0 +1,150 @@
+{
+  "job_id": "c667ea945bf0902d76a3756845d0b702d5419f1de42c2ebd0f1074ebf6552c5c",
+  "input_hash": "c667ea945bf0902d76a3756845d0b702d5419f1de42c2ebd0f1074ebf6552c5c",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 674,
+  "evaluated_at": "2026-11-04T20:32:36.827625+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied subscription_status record is authoritative and directly fits the requested symptom (paid plan showing as trial), including current plan, display sync state, and a next step. The login_failure record was not delivered to this helper, but that helper was assigned only subscription_status; the missing login_failure handling is captured under coverage, not as a record mismatch for the assigned issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your paid-plan activation is confirmed, and your account is active on the paid plan."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/observed_records/subscription_status/record/record_id",
+            "value": "BASE-0032:subscription_status"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/issue_type",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (subscription_status): it confirms paid activation, explains the stale trial display, and gives the refresh step. It is not required to answer login_failure, which belongs to another helper/issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The trial display was caused by stale cached data, which has been corrected on our side."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with two account issues. My subscription still shows a trial plan after I activated a paid plan. Also, when I log in on my phone, I am sent straight back to the sign-in page."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material claims are supported by the authoritative subscription_status record: paid plan activation and active state (current_plan=paid, state=active), stale trial display data and cache refresh (detail, display_sync_status=corrected), and the refresh next step. The definite 'corrected on our side' claim is within the recorded scope of the display-cache correction, analogous to a supported build-level fix. No refund timing/destination or other invented facts are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The trial display was caused by stale cached data, which has been corrected on our side. Please refresh your account page to see the paid plan; if it still shows the trial after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/current_plan",
+            "value": "paid"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps/0",
+            "value": "Refresh the account page to see the paid plan."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "FAIL",
+        "explanation": "The subscription_status answer includes the needed conclusion (paid plan active, stale display corrected) and the supported next step (refresh the account page). However, bundle coverage requires an answer for every expected issue, and login_failure is an expected issue from the original request with no retained answer in the bundle, so the run is incomplete.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan; if it still shows the trial after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues/0",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/expected_issues/1",
+            "value": "login_failure"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with two account issues. My subscription still shows a trial plan after I activated a paid plan. Also, when I log in on my phone, I am sent straight back to the sign-in page."
+          }
+        ],
+        "omissions": [
+          {
+            "required": "A retained answer resolving the login_failure issue (expired server-side session invalidated; close/reopen app and sign in again)",
+            "missing": "No answer for login_failure exists in the answers list; the bundle contains only the subscription_status response",
+            "requirement_source_path": "/expected_issues/1"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer keeps its assigned-issue scope, does not demand a new ticket for any included issue, and makes no unsupported whole-case closure claim. The definite correction claim is limited to the recorded display-cache refresh, and the answer preserves the need for user retest via the refresh-and-report-back instruction.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan; if it still shows the trial after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps/0",
+            "value": "Refresh the account page to see the paid plan."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

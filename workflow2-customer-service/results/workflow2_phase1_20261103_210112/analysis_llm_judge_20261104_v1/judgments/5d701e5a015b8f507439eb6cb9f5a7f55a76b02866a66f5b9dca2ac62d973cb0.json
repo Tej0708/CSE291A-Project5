@@ -1,0 +1,145 @@
+{
+  "job_id": "5d701e5a015b8f507439eb6cb9f5a7f55a76b02866a66f5b9dca2ac62d973cb0",
+  "input_hash": "5d701e5a015b8f507439eb6cb9f5a7f55a76b02866a66f5b9dca2ac62d973cb0",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 116,
+  "evaluated_at": "2026-11-04T20:06:29.770897+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied installation_failure record matches the customer's reported symptom (software update will not install) and provides concrete remediation steps and a fix_available state, sufficient to support an appropriate answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "clear the installer cache, then re-run setup version 4.2.1"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/installation_failure/record/symptom",
+            "value": "Software update cannot be installed."
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/user_request",
+            "value": "I appear to have been charged twice. Also, the software update will not install."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer directly addresses the helper's assigned issue (installation_failure) and does not need to cover duplicate_charge, which belongs to another helper's answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "For the update installation issue, there's a fix available: clear the installer cache, then re-run setup version 4.2.1."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "installation_failure"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts in the answer (fix available, clearing the installer cache, re-running setup version 4.2.1) are supported by the installation_failure record's detail, next_steps, and fix_available state. No refund timing or destination claims are made in this answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "there's a fix available: clear the installer cache, then re-run setup version 4.2.1"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/installation_failure/record/next_steps",
+            "value": [
+              "Clear the installer cache.",
+              "Re-run setup version 4.2.1."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/installation_failure/record/detail",
+            "value": "Clear installer cache, re-run setup 4.2.1."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The answer includes the necessary conclusion (a fix is available) and the supported remediation steps, plus a conditional follow-up if the update still fails. Draft coverage is limited to the assigned issue; duplicate_charge is covered by the other helper's answers in the same attempt.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the update still won't install after these steps, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "installation_failure"
+          },
+          {
+            "path": "/workflow_context/earlier_answers_in_same_attempt/0/assigned_issue",
+            "value": "duplicate_charge"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available fix at its actual scope (fix_available state in the record) and preserves the need for retest via conditional follow-up; it makes no unsupported verified-repair claim and does not demand a new ticket for an included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "there's a fix available: clear the installer cache, then re-run setup version 4.2.1. If the update still won't install after these steps, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/installation_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

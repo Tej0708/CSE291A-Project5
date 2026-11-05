@@ -1,0 +1,199 @@
+{
+  "job_id": "be2cd843f320384831fe83c7eddf40963db610f27e2db4c01435de9e14af02b5",
+  "input_hash": "be2cd843f320384831fe83c7eddf40963db610f27e2db4c01435de9e14af02b5",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 12,
+  "evaluated_at": "2026-11-04T19:59:27.236057+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both authoritative records match the requested scenarios (Settings-crash app_crash with build/next_steps; post-cancellation charge with amount, currency, and refund_issued state), so the environment supplies enough clean evidence for appropriate answers. The billing observed record is contradictory/unverified, but that is the injected corruption, not a scenario mismatch; the authoritative record still supports an appropriate response.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record",
+            "value": {
+              "detail": "Settings crash patched in build 7.9.3.",
+              "fixed_build": "7.9.3",
+              "issue_type": "app_crash",
+              "next_steps": [
+                "Install build 7.9.3 using your existing installation channel.",
+                "Reopen Settings and check whether the crash persists."
+              ],
+              "record_id": "BASE-0040:app_crash",
+              "state": "fix_available",
+              "symptom": "Opening Settings causes the app to crash.",
+              "user_confirmation": "not_observed"
+            }
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record",
+            "value": {
+              "amount": 29.99,
+              "currency": "USD",
+              "detail": "Post-cancel charge refunded.",
+              "issue_type": "charge_after_cancellation",
+              "record_id": "BASE-0040:charge_after_cancellation",
+              "state": "refund_issued"
+            }
+          },
+          {
+            "path": "/observed_records/charge_after_cancellation/record",
+            "value": {
+              "amount": 300.9,
+              "currency": "USD",
+              "detail": "Post-cancel charge refunded.",
+              "issue_type": "charge_after_cancellation",
+              "provenance": "unverified",
+              "record_id": "BASE-0040:charge_after_cancellation",
+              "state": "CONTRADICTORY"
+            }
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the app_crash answer covers the Settings crash fix, and the billing answer addresses the post-cancellation charge. Neither substitutes an unrelated issue, and draft coverage is limited to assigned_issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has been patched in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "I see the report of a $300.90 USD charge after your cancellation"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "charge_after_cancellation"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. I canceled my subscription but was charged afterward."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The app_crash answer is fully supported (build 7.9.3 fix_available, install channel, reopen-and-check next steps). The billing answer fails: it asserts a $300.90 USD charge that appears only in the corrupted observed record (authoritative amount is $29.99 USD), and it states the refund cannot be confirmed even though the authoritative record establishes refund_issued. Agreement with observed_records is not proof of correctness, and the supported refund state is contradicted rather than reported.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "I see the report of a $300.90 USD charge after your cancellation, but our record for this is contradictory and unverified, so I can't confirm whether a refund was actually issued."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/amount",
+            "value": 29.99
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/observed_records/charge_after_cancellation/record/amount",
+            "value": 300.9
+          },
+          {
+            "path": "/observed_records/charge_after_cancellation/record/state",
+            "value": "CONTRADICTORY"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "FAIL",
+        "explanation": "The app_crash answer includes the needed conclusion (fix available in build 7.9.3) and supported next steps (install via existing channel, reopen Settings, report back if it persists). The billing answer omits the necessary conclusion that the authoritative record establishes: a $29.99 USD post-cancellation charge was refunded. Instead it leaves the outcome unconfirmed and asks the customer for verification data, so the required answer content is missing.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "We need to verify this against the authoritative billing ledger before confirming any outcome."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/amount",
+            "value": 29.99
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "charge_after_cancellation",
+              "app_crash"
+            ]
+          }
+        ],
+        "omissions": [
+          {
+            "required": "Report the supported outcome for the post-cancellation charge: a $29.99 USD refund was issued per the authoritative billing record.",
+            "missing": "The billing answer asserts the refund cannot be confirmed and requests transaction details, never conveying the recorded refund_issued outcome or the correct $29.99 amount.",
+            "requirement_source_path": "/original_authoritative_records/charge_after_cancellation/record/state"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "FAIL",
+        "explanation": "No new ticket is demanded and the app_crash answer correctly keeps retest conditional rather than claiming observed user-side repair. However, the billing answer makes an unsupported status claim in the opposite direction: it asserts the refund outcome is unconfirmable/contradictory when the authoritative record establishes refund_issued, misrepresenting the supported completed intervention's status and deflecting verification onto the customer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "our record for this is contradictory and unverified, so I can't confirm whether a refund was actually issued"
+          },
+          {
+            "answer_index": 0,
+            "quote": "then reopen Settings to check whether the crash persists. If it still crashes after updating, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/detail",
+            "value": "Post-cancel charge refunded."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

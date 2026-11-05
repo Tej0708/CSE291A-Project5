@@ -1,0 +1,170 @@
+{
+  "job_id": "7092ee32cf157713cac1f97cf6feec1fed4f88ecea0493b188b9afc5fc3dd278",
+  "input_hash": "7092ee32cf157713cac1f97cf6feec1fed4f88ecea0493b188b9afc5fc3dd278",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 730,
+  "evaluated_at": "2026-11-04T20:37:58.066733+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The app_crash record matches the requested scenario (Settings crash) with an applicable fixed build and concrete next steps; the refund_status record is also present and authoritative for the refund part of the request, so the environment supports an appropriate response.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/symptom",
+            "value": "Opening Settings causes the app to crash."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/status",
+            "value": "ok"
+          },
+          {
+            "path": "/user_request",
+            "value": "I am waiting for an update on my refund. Also, the app crashes whenever i open settings."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (app_crash) directly; the refund_status issue belongs to another helper and is not a required part of this draft answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install build 7.9.3 through your existing installation channel, then reopen Settings to check whether the crash persists."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/expected_issues/1",
+            "value": "app_crash"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Build number 7.9.3, fix-available state, installation via the existing channel, and the reopen-Settings verification step are all explicitly supported by the authoritative app_crash record. No refund timing or destination claims are made, so no refund-grounding boundary is touched.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          },
+          {
+            "answer_index": 0,
+            "quote": "Please install build 7.9.3 through your existing installation channel, then reopen Settings to check whether the crash persists."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/detail",
+            "value": "Settings crash patched in build 7.9.3."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps/0",
+            "value": "Install build 7.9.3 using your existing installation channel."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps/1",
+            "value": "Reopen Settings and check whether the crash persists."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Draft-level coverage is complete for the assigned issue: the needed conclusion (fix available in 7.9.3), the remediation step (install via existing channel), the verification step (reopen Settings), and conditional follow-up are all present. Note separately: at bundle level the expected issue refund_status has no retained answer (its draft was discarded as an intermediate artifact and the run is incomplete), which drives the overall verdict rather than this draft's coverage.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If it still crashes after updating, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps/0",
+            "value": "Install build 7.9.3 using your existing installation channel."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps/1",
+            "value": "Reopen Settings and check whether the crash persists."
+          },
+          {
+            "path": "/expected_issues/0",
+            "value": "refund_status"
+          },
+          {
+            "path": "/workflow_context/disposition",
+            "value": "discarded_intermediate"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": [
+          "Bundle closure for the expected issue refund_status cannot be assessed because no retained refund_status answer exists in the supplied bundle; the only refund draft was discarded as an intermediate artifact and the run is incomplete at attempt 1, iteration 2."
+        ]
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer asserts only a build-level available fix, which the record explicitly supports (state fix_available), and does not claim the user's device is already repaired; it requires installation and retest with conditional follow-up. No unsupported definite repair claim and no demand for a new ticket.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          },
+          {
+            "answer_index": 0,
+            "quote": "then reopen Settings to check whether the crash persists"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM criterion assessment with locally derived repository aggregation; not human-verified",
+  "local_aggregation": {
+    "job_id": "7092ee32cf157713cac1f97cf6feec1fed4f88ecea0493b188b9afc5fc3dd278",
+    "request_id": 730,
+    "original_model_overall": "FAIL",
+    "locally_derived_overall": "PASS",
+    "criterion_labels_and_evidence_unchanged": true,
+    "method": "Existing aggregate(criteria, context), followed by unchanged strict validate; no API call"
+  }
+}

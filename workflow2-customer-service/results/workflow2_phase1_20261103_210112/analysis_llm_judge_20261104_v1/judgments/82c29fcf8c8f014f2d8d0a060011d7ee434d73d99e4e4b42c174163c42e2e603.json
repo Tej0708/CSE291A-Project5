@@ -1,0 +1,195 @@
+{
+  "job_id": "82c29fcf8c8f014f2d8d0a060011d7ee434d73d99e4e4b42c174163c42e2e603",
+  "input_hash": "82c29fcf8c8f014f2d8d0a060011d7ee434d73d99e4e4b42c174163c42e2e603",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 424,
+  "evaluated_at": "2026-11-04T20:20:40.739196+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "FAIL",
+        "explanation": "The observed incorrect_invoice record contradicts the clean authoritative record: it reports amount 191.0 USD, state CONTRADICTORY and provenance unverified, whereas the authoritative record shows amount 19.0 USD and state corrected. This is an actual semantic mismatch in the supplied environment data, so the record set cannot support an appropriate billing response. The app_crash observed record matches the authoritative record and aligns with the Settings-crash request.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "our record shows an invoice reissued at $191.00 USD, but this record is flagged as contradictory and unverified"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/observed_records/incorrect_invoice/record/amount",
+            "value": 191.0
+          },
+          {
+            "path": "/observed_records/incorrect_invoice/record/state",
+            "value": "CONTRADICTORY"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/observed_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its own assigned issue: the app_crash answer addresses the Settings crash remediation and the incorrect_invoice answer addresses the invoice amount question. Neither substitutes an unrelated issue, and draft coverage is limited to assigned_issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Regarding the invoice amount: our record shows an invoice reissued at $191.00 USD"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The app_crash answer is grounded: build 7.9.3, the existing installation channel, and reopening Settings all appear in the authoritative record, and no unsupported repair claim is made. However, the incorrect_invoice answer asserts an invoice reissued at $191.00 USD, which directly contradicts the authoritative record amount of $19.00 USD (state corrected). Reporting the corrupted observed-record amount as the record's content is a material factual error against the clean reference, so grounding fails.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "our record shows an invoice reissued at $191.00 USD"
+          },
+          {
+            "answer_index": 0,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "FAIL",
+        "explanation": "The app_crash answer includes the needed conclusion (fix available in build 7.9.3), the supported next steps (install via existing channel, reopen Settings), and a conditional follow-up, so it covers its issue. The incorrect_invoice answer omits the necessary conclusion established by the authoritative record — that the invoice was reissued at the correct amount of $19.00 USD (state corrected) — and instead asserts the wrong amount and asks the customer to supply the figure, leaving the issue unresolved despite available authoritative evidence.",
+        "answer_excerpts": [
+          {
+            "answer_index": 1,
+            "quote": "Could you confirm the amount you were charged or expected so we can verify against the billing ledger?"
+          },
+          {
+            "answer_index": 0,
+            "quote": "Please install that build through your existing installation channel, then reopen Settings to see if the crash persists. If it still crashes afterward, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          }
+        ],
+        "omissions": [
+          {
+            "required": "Necessary conclusion for incorrect_invoice: the invoice was reissued at the correct amount of $19.00 USD (state corrected)",
+            "missing": "The answer never states the authoritative corrected amount or corrected state; it asserts $191.00 and defers to an unverified ledger check",
+            "requirement_source_path": "/original_authoritative_records/incorrect_invoice/record"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The app_crash answer describes an available fix at its actual scope (fix available in build 7.9.3) and preserves the need for retest, without claiming the user's device is already repaired. The incorrect_invoice answer makes no unsupported whole-case closure claim, does not demand a new ticket for an included issue, and its 'once confirmed, we can correct any remaining discrepancy' is prospective rather than a definite repair claim.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A fix for the Settings crash is available in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Once confirmed, we can correct any remaining discrepancy."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "app_crash"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "DATA_ISSUE",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

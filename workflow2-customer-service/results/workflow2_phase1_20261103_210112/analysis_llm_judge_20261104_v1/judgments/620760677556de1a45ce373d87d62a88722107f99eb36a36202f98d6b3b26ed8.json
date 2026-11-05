@@ -1,0 +1,188 @@
+{
+  "job_id": "620760677556de1a45ce373d87d62a88722107f99eb36a36202f98d6b3b26ed8",
+  "input_hash": "620760677556de1a45ce373d87d62a88722107f99eb36a36202f98d6b3b26ed8",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 49,
+  "evaluated_at": "2026-11-04T20:02:56.368921+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested issues: a sync_failure record describing a flushed sync queue with re-enable/check next steps, and an incorrect_invoice record showing a corrected reissued invoice at $19.00 USD. These fit the user's sync and invoice complaints and support appropriate responses.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please re-enable sync on your device, then check whether your files now sync between devices."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/issue_type",
+            "value": "sync_failure"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/issue_type",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the sync answer addresses the sync failure and the invoice answer addresses the incorrect invoice. Neither substitutes an unrelated issue, and draft coverage is limited to assigned issues.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end. Please re-enable sync on your device"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "sync_failure"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "sync_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Material facts are supported: the sync queue flush is recorded in the sync_failure record, and the $19.00 USD corrected reissued invoice matches the authoritative billing record (amount 19.0, currency USD, state corrected). No refund timing or destination claims are made, and no unsupported completed user-side repair is asserted.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end."
+          },
+          {
+            "answer_index": 1,
+            "quote": "reissued at the accurate amount of $19.00 USD"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/detail",
+            "value": "Sync queue flushed; re-enable sync."
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The bundle covers both expected issues with the needed conclusions and next steps: re-enable sync and verify file syncing for sync_failure, and review the corrected invoice with a follow-up path for incorrect_invoice. No expected issue is missing and execution completed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please re-enable sync on your device, then check whether your files now sync between devices. If it still doesn't work after that, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please review the updated invoice, and if the amount still looks wrong, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "sync_failure"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/next_steps",
+            "value": [
+              "Re-enable sync.",
+              "Check whether files sync between devices."
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The sync answer describes a recorded intervention (queue flushed) at its actual scope and asks the user to re-enable and verify, without claiming the problem is definitely fixed; this matches the supported 'we restarted the node; retry' pattern. The invoice answer reports a recorded completed correction (state corrected). No new-ticket demand and no unsupported whole-case closure.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've flushed the stuck sync queue on our end. Please re-enable sync on your device, then check whether your files now sync between devices."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your invoice has been corrected and reissued at the accurate amount of $19.00 USD."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/sync_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/sync_failure/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

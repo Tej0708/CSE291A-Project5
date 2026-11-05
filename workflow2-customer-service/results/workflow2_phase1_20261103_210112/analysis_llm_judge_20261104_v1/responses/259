@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-a349e7454c737182",
+  "created": 1793823091,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"The password_reset record matches the customer's reported problem (reset link not working) and supplies the reissued-link remediation, validity window, and delivery channel needed to answer it; the refund record also aligns with the refund-status request.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"A new password reset link has been sent to your account email and is valid for 30 minutes.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/issue_type\",\"value\":\"password_reset\"},{\"path\":\"/original_authoritative_records/password_reset/record/detail\",\"value\":\"Reset link reissued, valid 30m.\"},{\"path\":\"/original_authoritative_records/refund_status/record/issue_type\",\"value\":\"refund_status\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"The answer addresses the helper's assigned password_reset issue; the refund_status issue is covered by a separate helper answer in the same attempt, so it is not required here.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"Please use it within that window to reset your password.\"}],\"source_fields\":[{\"path\":\"/answers/0/assigned_issue\",\"value\":\"password_reset\"},{\"path\":\"/expected_issues\",\"value\":[\"refund_status\",\"password_reset\"]},{\"path\":\"/workflow_context/earlier_answers_in_same_attempt/0/assigned_issue\",\"value\":\"refund_status\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"PASS\",\"explanation\":\"All material facts are supported by the authoritative record: a reset link was reissued (sent), the delivery channel is the account email, and the validity is 30 minutes. No refund timing or destination is asserted in this answer, and no unsupported repair claim is made.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"A new password reset link has been sent to your account email and is valid for 30 minutes.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/delivery_channel\",\"value\":\"account email\"},{\"path\":\"/original_authoritative_records/password_reset/record/valid_for_minutes\",\"value\":30},{\"path\":\"/original_authoritative_records/password_reset/record/detail\",\"value\":\"Reset link reissued, valid 30m.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"The answer includes the needed conclusion (a new link was issued) and the record's next step (use the link within 30 minutes), plus a conditional follow-up if it still fails. No record fields beyond this are required.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"Please use it within that window to reset your password. If the link still doesn't work, let us know.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/next_steps\",\"value\":[\"Use the reissued reset link within 30 minutes.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"The answer reports a supported completed action (link reissued/sent) at its actual scope and does not claim the underlying problem is fixed; the conditional follow-up preserves the need for the user to retest. No new-ticket demand is made for an included issue.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If the link still doesn't work, let us know.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/state\",\"value\":\"fix_available\"},{\"path\":\"/original_authoritative_records/password_reset/record/user_confirmation\",\"value\":\"not_observed\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"PASS\",\"human_followup_needed\":false}",
+        "role": "assistant",
+        "reasoning_content": "Evaluate the password_reset answer. Assigned issue: password_reset. Answer: \"A new password reset link has been sent to your account email and is valid for 30 minutes. Please use it within that window to reset your password. If the link still doesn't work, let us know.\"\n\nRecord: reset link reissued, valid 30m, delivery channel account email, state fix_available, next steps use link within 30 minutes. Answer matches record. Grounding: \"has been sent\" — record says \"Reset link reissued\" — supported. Valid 30 minutes supported. Destination \"account email\" supported by delivery_channel.\n\nRelevance: addresses password reset, not refund — allowed per scope.\n\nCoverage: needed conclusion (new link sent, valid 30 min) and next steps (use it, follow up if fails). PASS.\n\nStatus_responsibility: state fix_available, user_confirmation not_observed. Answer says \"A new password reset link has been sent\" — that's a supported completed action (reissued). Doesn't claim fixed. Conditional follow-up. PASS.\n\nRecord alignment: record fits request (password reset link doesn't work; record is reissued link). PASS. Refund record also present and authoritative. Alignment fine.\n\nOverall: PASS, human_followup_needed false? Rule: \"Human follow-up must be true if any criterion is non-PASS.\" All PASS → false.\n\nNeed source fields for each criterion. Provide excerpts.",
+        "provider_specific_fields": {
+          "reasoning": "Evaluate the password_reset answer. Assigned issue: password_reset. Answer: \"A new password reset link has been sent to your account email and is valid for 30 minutes. Please use it within that window to reset your password. If the link still doesn't work, let us know.\"\n\nRecord: reset link reissued, valid 30m, delivery channel account email, state fix_available, next steps use link within 30 minutes. Answer matches record. Grounding: \"has been sent\" — record says \"Reset link reissued\" — supported. Valid 30 minutes supported. Destination \"account email\" supported by delivery_channel.\n\nRelevance: addresses password reset, not refund — allowed per scope.\n\nCoverage: needed conclusion (new link sent, valid 30 min) and next steps (use it, follow up if fails). PASS.\n\nStatus_responsibility: state fix_available, user_confirmation not_observed. Answer says \"A new password reset link has been sent\" — that's a supported completed action (reissued). Doesn't claim fixed. Conditional follow-up. PASS.\n\nRecord alignment: record fits request (password reset link doesn't work; record is reissued link). PASS. Refund record also present and authoritative. Alignment fine.\n\nOverall: PASS, human_followup_needed false? Rule: \"Human follow-up must be true if any criterion is non-PASS.\" All PASS → false.\n\nNeed source fields for each criterion. Provide excerpts."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1071,
+    "prompt_tokens": 4167,
+    "total_tokens": 5238,
+    "completion_tokens_details": {
+      "reasoning_tokens": 294
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}

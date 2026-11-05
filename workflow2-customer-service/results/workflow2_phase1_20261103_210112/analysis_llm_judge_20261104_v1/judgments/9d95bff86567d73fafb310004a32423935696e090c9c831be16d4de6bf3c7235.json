@@ -1,0 +1,138 @@
+{
+  "job_id": "9d95bff86567d73fafb310004a32423935696e090c9c831be16d4de6bf3c7235",
+  "input_hash": "9d95bff86567d73fafb310004a32423935696e090c9c831be16d4de6bf3c7235",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 120,
+  "evaluated_at": "2026-11-04T20:06:44.672641+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The installation_failure record matches the requested scenario (software update will not install) and supplies applicable remediation steps; the duplicate_charge authoritative record matches the reported duplicate charge with amount, currency, and refund_issued state.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "For the update installation issue, please try these steps:"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/installation_failure/record/symptom",
+            "value": "Software update cannot be installed."
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (installation_failure) with concrete steps; the duplicate_charge issue is another helper's scope and not required here.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "1. Clear the installer cache.\n2. Re-run setup version 4.2.1."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "installation_failure"
+          },
+          {
+            "path": "/expected_issues/1",
+            "value": "installation_failure"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The installation_failure steps are supported by the record. However, the latest retained duplicate_charge answer asserts an unsupported refund timeline ('your bank's standard processing time'), a known grounding FAIL under the frozen rubric (BASE-0010/0011 precedents); the earlier iteration also asserted an unsupported destination ('reversed on your account'). The supported parts are the $49.00 USD amount and refund_issued state.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the update still won't install after these steps, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/installation_failure/record/next_steps",
+            "value": [
+              "Clear the installer cache.",
+              "Re-run setup version 4.2.1."
+            ]
+          },
+          {
+            "path": "/workflow_context/earlier_answers_in_same_attempt/1/answer",
+            "value": "We've reviewed your account and confirmed the duplicate charge, and a refund of $49.00 USD has been issued to reverse it. Please allow your bank's standard processing time for the refund to appear on your statement. If you don't see it reflected, let us know and we'll follow up."
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/amount",
+            "value": 49.0
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Both expected issues are covered in the bundle: duplicate_charge by the retained earlier answers and installation_failure by this answer, which includes the needed remediation steps and a conditional follow-up. No expected issue is missing.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the update still won't install after these steps, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "duplicate_charge",
+              "installation_failure"
+            ]
+          },
+          {
+            "path": "/workflow_context/earlier_answers_in_same_attempt/1/assigned_issue",
+            "value": "duplicate_charge"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The installation answer offers an available fix with conditional prospective follow-up and no definite repair claim; the duplicate_charge answer's refund_issued claim is supported by the record and no new ticket is demanded for an included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the update still won't install after these steps, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/installation_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/duplicate_charge/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

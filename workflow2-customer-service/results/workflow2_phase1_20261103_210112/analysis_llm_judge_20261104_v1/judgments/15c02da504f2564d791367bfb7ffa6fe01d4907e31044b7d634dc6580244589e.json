@@ -1,0 +1,183 @@
+{
+  "job_id": "15c02da504f2564d791367bfb7ffa6fe01d4907e31044b7d634dc6580244589e",
+  "input_hash": "15c02da504f2564d791367bfb7ffa6fe01d4907e31044b7d634dc6580244589e",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 241,
+  "evaluated_at": "2026-11-04T20:10:58.372498+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested scenarios: the subscription_status record is authoritative and describes paid-plan activation with stale trial display data, and the login_failure record matches the phone sign-in loop symptom with a diagnostic and remediation steps.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Your paid-plan activation is confirmed, and your account is active on the paid plan."
+          },
+          {
+            "answer_index": 1,
+            "quote": "We found that an expired server-side session was causing the phone login loop"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/current_plan",
+            "value": "paid"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Paid-plan activation is confirmed. The account page had stale trial-plan data; the display cache has been refreshed."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/symptom",
+            "value": "Phone login returns immediately to the sign-in page."
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with two account issues. My subscription still shows a trial plan after I activated a paid plan. Also, when I log in on my phone, I am sent straight back to the sign-in page."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue only: the first covers subscription status display, the second covers the phone login loop. Neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please close and reopen the app on your phone, then sign in again to create a new session."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "login_failure"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts are supported: paid-plan activation and active status, stale cache cause and corrected display sync, expired server-side session cause and its invalidation. No refund timing or destination claims are present, and no invented guarantees or completed user-side actions are asserted.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The trial display was caused by stale cached data, which has been corrected on our side."
+          },
+          {
+            "answer_index": 1,
+            "quote": "an expired server-side session was causing the phone login loop, and it has been invalidated so a fresh sign-in can work"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/displayed_status",
+            "value": "active"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Diagnostic identified an expired server-side session. The session was invalidated to permit a fresh sign-in."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The subscription answer gives the needed conclusion (paid plan active, stale cache corrected) and the record's next step (refresh the account page) with a conditional follow-up. The login answer gives the cause, the completed intervention, both documented next steps, and a conditional follow-up. Both expected issues are covered by the retained bundle.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to see the paid plan; if it still shows the trial after refreshing, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please close and reopen the app on your phone, then sign in again to create a new session. If you're still returned to the sign-in page after that, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to see the paid plan."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps",
+            "value": [
+              "Close and reopen the app on your phone.",
+              "Sign in again to create a new session."
+            ]
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The subscription answer's 'corrected on our side' claim is scoped to the display cache, which the authoritative record explicitly marks as refreshed/corrected, so the success claim is supported at its actual scope. The login answer reports the recorded session invalidation without claiming verified repair, and requests a retry with conditional follow-up. No new-ticket demand and no unsupported whole-case closure.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "which has been corrected on our side. Please refresh your account page to see the paid plan"
+          },
+          {
+            "answer_index": 1,
+            "quote": "it has been invalidated so a fresh sign-in can work. Please close and reopen the app on your phone, then sign in again"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/display_sync_status",
+            "value": "corrected"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

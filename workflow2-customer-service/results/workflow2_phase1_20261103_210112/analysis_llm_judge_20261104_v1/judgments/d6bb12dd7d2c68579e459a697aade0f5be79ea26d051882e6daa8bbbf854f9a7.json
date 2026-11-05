@@ -1,0 +1,136 @@
+{
+  "job_id": "d6bb12dd7d2c68579e459a697aade0f5be79ea26d051882e6daa8bbbf854f9a7",
+  "input_hash": "d6bb12dd7d2c68579e459a697aade0f5be79ea26d051882e6daa8bbbf854f9a7",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 537,
+  "evaluated_at": "2026-11-04T20:25:50.750257+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The supplied password_reset record matches the requested scenario (broken reset link) and provides the reissued-link state, delivery channel, and validity needed for an appropriate reply. The refund_status record also exists in the original authoritative records with status ok, so the environment covers both requested issues; this helper's record fits its assigned issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/issue_type",
+            "value": "password_reset"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/detail",
+            "value": "Reset link reissued, valid 30m."
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/issue_type",
+            "value": "refund_status"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer directly addresses the helper's assigned password_reset issue (non-working reset link) by delivering the reissued link and its validity. It does not need to cover refund_status, which is another issue outside this draft's assigned scope.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email — it's valid for 30 minutes, so please use it soon."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The password reset link does not work. I am waiting for an update on my refund."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material facts are supported by the original authoritative password_reset record: the link was reissued (detail 'Reset link reissued'), delivered via 'account email' (delivery_channel), and valid for 30 minutes (valid_for_minutes: 30). No refund timing or destination claims are made, so no refund-grounding boundary is triggered.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "it's valid for 30 minutes, so please use it soon"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/detail",
+            "value": "Reset link reissued, valid 30m."
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "The draft includes the needed conclusion (a new reset link was issued) and the supported next step (use it within 30 minutes), plus a conditional follow-up if it fails again, matching the record's next_steps. Draft coverage is limited to the assigned issue; the refund_status issue is not required in this helper's answer.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If the new link still doesn't work, let us know and we'll take another look."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps/0",
+            "value": "Use the reissued reset link within 30 minutes."
+          },
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer describes an available fix at its actual scope (a reissued link was sent, which the record supports as fix_available) and preserves the need for the user to retest, with conditional follow-up language. It does not claim verified repair, does not demand a new ticket, and makes no unsupported whole-case closure claim.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email — it's valid for 30 minutes, so please use it soon. If the new link still doesn't work, let us know and we'll take another look."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/user_confirmation",
+            "value": "not_observed"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-9c41d2a995b6a995",
+  "created": 1793823468,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"Both records match the requested issues: a reissued password reset link (account email, 30-minute validity) for the non-working reset link, and a refund_issued record for the $29.99 USD post-cancellation charge. These provide sufficient evidence for appropriate answers.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"A new password reset link has been sent to your account email\"},{\"answer_index\":1,\"quote\":\"The post-cancellation charge of $29.99 USD has been refunded.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record\",\"value\":{\"delivery_channel\":\"account email\",\"detail\":\"Reset link reissued, valid 30m.\",\"issue_type\":\"password_reset\",\"next_steps\":[\"Use the reissued reset link within 30 minutes.\"],\"record_id\":\"BASE-0036:password_reset\",\"state\":\"fix_available\",\"user_confirmation\":\"not_observed\",\"valid_for_minutes\":30}},{\"path\":\"/original_authoritative_records/charge_after_cancellation/record\",\"value\":{\"amount\":29.99,\"currency\":\"USD\",\"detail\":\"Post-cancel charge refunded.\",\"issue_type\":\"charge_after_cancellation\",\"record_id\":\"BASE-0036:charge_after_cancellation\",\"state\":\"refund_issued\"}}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"Each answer addresses its assigned issue only: the reset-link answer addresses password_reset and the refund answer addresses charge_after_cancellation, matching the two expected issues in the request.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If the new link still doesn't work, let us know.\"},{\"answer_index\":1,\"quote\":\"Please check your payment account to confirm the refund appears.\"}],\"source_fields\":[{\"path\":\"/expected_issues\",\"value\":[\"charge_after_cancellation\",\"password_reset\"]},{\"path\":\"/user_request\",\"value\":\"I need help with my account. The password reset link does not work. I canceled my subscription but was charged afterward.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"PASS\",\"explanation\":\"Reset-link delivery channel (account email) and 30-minute validity are explicitly recorded. The refund amount ($29.99), currency (USD), and refund_issued state are recorded. The refund answer uses generic checking language without asserting an unsupported destination, which is allowed under the baseline.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"it's valid for 30 minutes, so please use it soon\"},{\"answer_index\":1,\"quote\":\"Please check your payment account to confirm the refund appears.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/valid_for_minutes\",\"value\":30},{\"path\":\"/original_authoritative_records/password_reset/record/delivery_channel\",\"value\":\"account email\"},{\"path\":\"/original_authoritative_records/charge_after_cancellation/record/amount\",\"value\":29.99},{\"path\":\"/original_authoritative_records/charge_after_cancellation/record/currency\",\"value\":\"USD\"},{\"path\":\"/original_authoritative_records/charge_after_cancellation/record/state\",\"value\":\"refund_issued\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"Both expected issues are covered with necessary conclusions and next steps: use the reissued link within 30 minutes, and check the payment account with a follow-up path. Execution completed and no expected issue is missing.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"A new password reset link has been sent to your account email — it's valid for 30 minutes, so please use it soon.\"},{\"answer_index\":1,\"quote\":\"If it doesn't show up or you have questions, let us know.\"}],\"source_fields\":[{\"path\":\"/expected_issues\",\"value\":[\"charge_after_cancellation\",\"password_reset\"]},{\"path\":\"/execution_completed\",\"value\":true},{\"path\":\"/original_authoritative_records/password_reset/record/next_steps\",\"value\":[\"Use the reissued reset link within 30 minutes.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"The reset answer reports a supported completed action (link reissued/sent) without claiming verified user-side repair, and offers conditional follow-up. The refund answer reports the recorded refund_issued state at its actual scope. No new-ticket demand and no unsupported whole-case closure.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If the new link still doesn't work, let us know.\"},{\"answer_index\":1,\"quote\":\"The post-cancellation charge of $29.99 USD has been refunded.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/state\",\"value\":\"fix_available\"},{\"path\":\"/original_authoritative_records/charge_after_cancellation/record/state\",\"value\":\"refund_issued\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"PASS\",\"human_followup_needed\":false}",
+        "role": "assistant",
+        "reasoning_content": "Let me evaluate.\n\nAnswer 0 (password_reset): \"A new password reset link has been sent to your account email — it's valid for 30 minutes, so please use it soon. If the new link still doesn't work, let us know.\"\n\nRecord: reset link reissued, valid 30m, delivery channel account email, state fix_available. Grounding: link sent to account email — supported. Valid 30 minutes — supported. No refund timing issues. Status: fix_available, not claiming verified repair — \"has been sent\" is a supported completed action (reissued). PASS.\n\nAnswer 1 (charge_after_cancellation): \"$29.99 USD has been refunded\" — record: amount 29.99, USD, refund_issued. Supported. \"Please check your payment account to confirm the refund appears\" — generic checking, no destination asserted. Per BASE-0006/0036/0040 generic-check PASS. PASS.\n\nRecord alignment: records fit requests. password_reset record is authoritative:false but status ok and matches request. Alignment PASS.\n\nCoverage: both expected issues covered. Execution completed. PASS.\n\nRelevance: each addresses assigned issue. PASS.\n\nStatus_responsibility: no new ticket demands, no unsupported closure. PASS.\n\nOverall PASS, human_followup_needed false.",
+        "provider_specific_fields": {
+          "reasoning": "Let me evaluate.\n\nAnswer 0 (password_reset): \"A new password reset link has been sent to your account email — it's valid for 30 minutes, so please use it soon. If the new link still doesn't work, let us know.\"\n\nRecord: reset link reissued, valid 30m, delivery channel account email, state fix_available. Grounding: link sent to account email — supported. Valid 30 minutes — supported. No refund timing issues. Status: fix_available, not claiming verified repair — \"has been sent\" is a supported completed action (reissued). PASS.\n\nAnswer 1 (charge_after_cancellation): \"$29.99 USD has been refunded\" — record: amount 29.99, USD, refund_issued. Supported. \"Please check your payment account to confirm the refund appears\" — generic checking, no destination asserted. Per BASE-0006/0036/0040 generic-check PASS. PASS.\n\nRecord alignment: records fit requests. password_reset record is authoritative:false but status ok and matches request. Alignment PASS.\n\nCoverage: both expected issues covered. Execution completed. PASS.\n\nRelevance: each addresses assigned issue. PASS.\n\nStatus_responsibility: no new ticket demands, no unsupported closure. PASS.\n\nOverall PASS, human_followup_needed false."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1292,
+    "prompt_tokens": 4210,
+    "total_tokens": 5502,
+    "completion_tokens_details": {
+      "reasoning_tokens": 266
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}

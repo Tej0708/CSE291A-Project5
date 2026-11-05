@@ -1,0 +1,179 @@
+{
+  "job_id": "6e490012602583e631b970dd1a4bde9820f96885a0eba6aae30debf2ed264dc8",
+  "input_hash": "6e490012602583e631b970dd1a4bde9820f96885a0eba6aae30debf2ed264dc8",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 536,
+  "evaluated_at": "2026-11-04T20:25:39.587776+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records match the requested issues: a reissued password reset link (fix_available, 30-minute validity, account email channel) fits the broken-link request, and an authoritative completed refund record ($15.00 USD, settled to card) fits the refund status inquiry. No scenario mismatch.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/issue_type",
+            "value": "password_reset"
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/state",
+            "value": "completed"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The password reset link does not work. I am waiting for an update on my refund."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the password_reset answer addresses the non-working link with a reissued link, and the refund_status answer reports the refund state. Draft coverage is limited to assigned_issue, so neither needs to cover the other.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email and is valid for 30 minutes."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your refund has been completed: $15.00 USD was settled back to your card."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "password_reset"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "refund_status"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "refund_status",
+              "password_reset"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Password reset answer: delivery channel (account email) and 30-minute validity are both in the record; no timing or destination invention. Refund answer: amount ($15.00), currency (USD), completed state, and destination (settled to card) are all explicitly supported by the authoritative record detail 'Refund settled to card.' No unsupported refund timing is asserted; the follow-up is generic checking without new claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "valid for 30 minutes"
+          },
+          {
+            "answer_index": 1,
+            "quote": "$15.00 USD was settled back to your card"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/valid_for_minutes",
+            "value": 30
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/delivery_channel",
+            "value": "account email"
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/amount",
+            "value": 15.0
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/detail",
+            "value": "Refund settled to card."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Bundle covers both expected issues. Password reset answer includes the needed conclusion (new link sent) and the remediation/verification step (use within 30 minutes, report back if it fails). Refund answer includes the conclusion (completed, amount, destination) and a follow-up step. No expected issue is missing.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please use it within that window to reset your password. If the link still doesn't work, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "If it doesn't appear on your card statement, let us know and we can look into it further."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "refund_status",
+              "password_reset"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/password_reset/record/next_steps",
+            "value": [
+              "Use the reissued reset link within 30 minutes."
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The password reset answer describes an available fix (reissued link) at its actual scope and preserves the need for the user to retest, with conditional follow-up. The refund answer reports a completed refund, which is directly supported by the authoritative record state 'completed'; it does not demand a new ticket or make unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "A new password reset link has been sent to your account email"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your refund has been completed"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/password_reset/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/record/state",
+            "value": "completed"
+          },
+          {
+            "path": "/original_authoritative_records/refund_status/authoritative",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

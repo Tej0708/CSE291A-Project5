@@ -1,0 +1,165 @@
+{
+  "job_id": "f79aecf0ab6cb9a3f8a466ed0bffffb77a3b6124a20940a3a551326e4b9f6b74",
+  "input_hash": "f79aecf0ab6cb9a3f8a466ed0bffffb77a3b6124a20940a3a551326e4b9f6b74",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 30,
+  "evaluated_at": "2026-11-04T20:02:00.789250+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both records fit the concrete request: the app_crash record matches the Settings-crash symptom with an applicable fixed build and next steps, and the billing record matches the post-cancellation charge with amount, currency, and refund_issued state.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/symptom",
+            "value": "Opening Settings causes the app to crash."
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/fixed_build",
+            "value": "7.9.3"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. I canceled my subscription but was charged afterward."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the first answers the Settings crash, the second answers the post-cancellation charge; neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has been patched in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The post-cancellation charge of $29.99 USD has been refunded."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "app_crash"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "charge_after_cancellation"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Build 7.9.3, installation channel, and retest steps are all supported by the app_crash record. The $29.99 USD refund claim matches the billing record's amount, currency, and refund_issued state. No refund timing is asserted, and 'check your payment account to confirm the refund appears' is generic checking that asserts no specific destination, which is allowed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please install build 7.9.3 using your existing installation channel, then reopen Settings to check whether the crash persists."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The post-cancellation charge of $29.99 USD has been refunded. Please check your payment account to confirm the refund appears."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/next_steps",
+            "value": [
+              "Install build 7.9.3 using your existing installation channel.",
+              "Reopen Settings and check whether the crash persists."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/amount",
+            "value": 29.99
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/currency",
+            "value": "USD"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Both expected issues are covered with necessary conclusions and next steps: the crash answer gives the fixed build, installation via the existing channel, and reopening Settings to verify; the billing answer gives the refund conclusion, a verification step, and a follow-up path. No record fields need to be repeated verbatim.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If it still crashes after updating, let us know."
+          },
+          {
+            "answer_index": 1,
+            "quote": "If it doesn't show up or you have questions, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "charge_after_cancellation",
+              "app_crash"
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The crash answer reports a supported build-level fix ('patched in build 7.9.3' matches state fix_available) and preserves the need for user-side installation and retest without claiming the user's device is already repaired. The billing answer reports the recorded refund_issued state at its actual scope and does not demand a new ticket or make unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "The Settings crash has been patched in build 7.9.3."
+          },
+          {
+            "answer_index": 1,
+            "quote": "The post-cancellation charge of $29.99 USD has been refunded."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/app_crash/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/app_crash/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/charge_after_cancellation/record/state",
+            "value": "refund_issued"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

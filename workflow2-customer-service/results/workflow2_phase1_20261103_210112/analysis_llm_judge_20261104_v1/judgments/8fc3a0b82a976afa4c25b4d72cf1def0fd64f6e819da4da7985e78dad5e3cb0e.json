@@ -1,0 +1,151 @@
+{
+  "job_id": "8fc3a0b82a976afa4c25b4d72cf1def0fd64f6e819da4da7985e78dad5e3cb0e",
+  "input_hash": "8fc3a0b82a976afa4c25b4d72cf1def0fd64f6e819da4da7985e78dad5e3cb0e",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 425,
+  "evaluated_at": "2026-11-04T20:21:21.531024+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative incorrect_invoice record matches the requested scenario (invoice amount concern) and contains sufficient clean facts (amount 19.0 USD, state 'corrected', reissue completed) to support an appropriate answer. The observed record is corrupted (CONTRADICTORY, 191.0, unverified), but the clean authoritative record is supplied, so the environment can support a correct response; the helper's reliance on the corrupted copy is an answer failure, not an environment mismatch.",
+        "answer_excerpts": [],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/observed_records/incorrect_invoice/record/state",
+            "value": "CONTRADICTORY"
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (incorrect_invoice) and does not need to cover app_crash, which belongs to another helper/issue. Draft coverage is limited to the assigned issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "I looked into the invoice amount concern"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "incorrect_invoice"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "incorrect_invoice",
+              "app_crash"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "FAIL",
+        "explanation": "The answer asserts the billing record is 'contradictory and unverified' and that the reissue cannot be confirmed. The original authoritative record cleanly states the invoice was reissued at the correct amount of 19.0 USD with state 'corrected'. These claims come from the corrupted observed record (state CONTRADICTORY, provenance unverified, amount 191.0), whose values are not proof of correctness; asserting the contradictory/unverified record state and inability to confirm a recorded completed reissue are unsupported material misstatements against the authoritative reference.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "our billing record for this issue is currently contradictory and unverified"
+          },
+          {
+            "answer_index": 0,
+            "quote": "I can't confirm the correct amount or that a reissue was completed"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/detail",
+            "value": "Invoice reissued at correct amount."
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/amount",
+            "value": 19.0
+          },
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record/state",
+            "value": "corrected"
+          },
+          {
+            "path": "/observed_records/incorrect_invoice/record/provenance",
+            "value": "unverified"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "FAIL",
+        "explanation": "The assigned issue's needed conclusion — that the invoice was reissued at the correct amount (19.0 USD) per the authoritative record — is omitted. The answer instead asks the customer to supply the invoice number and charged amount, information already established by the authoritative record, and provides no supported correction status or next step grounded in that record.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Could you share the invoice number and the amount you were charged (in USD) so we can verify it against the billing ledger?"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/incorrect_invoice/record",
+            "value": {
+              "amount": 19.0,
+              "currency": "USD",
+              "detail": "Invoice reissued at correct amount.",
+              "issue_type": "incorrect_invoice",
+              "record_id": "BASE-0004:incorrect_invoice",
+              "state": "corrected"
+            }
+          }
+        ],
+        "omissions": [
+          {
+            "required": "Report the supported conclusion that the invoice was reissued at the correct amount (19.0 USD, state corrected)",
+            "missing": "No mention of the completed reissue or the correct amount; the answer claims it cannot be confirmed",
+            "requirement_source_path": "/original_authoritative_records/incorrect_invoice/record"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer makes no unsupported definite-repair or whole-case closure claim, does not demand a new ticket for an included issue, and keeps ownership of the correction ('we can proceed with any correction needed'). Its misstatement of the record state is scored under grounding, and the omitted completed-intervention report under coverage.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Once confirmed, we can proceed with any correction needed."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. The app crashes whenever I open settings. The invoice amount looks incorrect."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

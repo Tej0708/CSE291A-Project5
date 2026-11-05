@@ -1,0 +1,175 @@
+{
+  "job_id": "c8da926753b6ca5f7d24d74777065e55fc942268204816150899cbb45afa8564",
+  "input_hash": "c8da926753b6ca5f7d24d74777065e55fc942268204816150899cbb45afa8564",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 511,
+  "evaluated_at": "2026-11-04T20:24:49.271554+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both authoritative records match the requested scenarios: a subscription-status record (active through current billing cycle, display refreshed) for the status complaint and a login record (auth node restarted, retry step) for the login failure. The observed subscription record carries a corrupted CONTRADICTORY/unverified marker, but the clean authoritative record supports an appropriate response, so alignment holds.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our records show your subscription is active through the current billing cycle"
+          },
+          {
+            "answer_index": 1,
+            "quote": "the authentication node has been restarted"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/user_request",
+            "value": "My subscription status looks wrong. Also, i cannot log in to my account."
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue only: answer 0 covers subscription status and answer 1 covers login failure, matching the expected issue split; neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our records show your subscription is active through the current billing cycle"
+          },
+          {
+            "answer_index": 1,
+            "quote": "A fix is available for the login issue"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "login_failure"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Answer 0's active-through-current-cycle claim and refreshed display match the authoritative subscription record exactly. Answer 1's restart claim matches the recorded intervention and 'fix is available' matches the record's fix_available state; no refund timing/destination or invented facts are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "the account status display has been refreshed to reflect that"
+          },
+          {
+            "answer_index": 1,
+            "quote": "the authentication node has been restarted"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Answer 0 gives the needed conclusion (active through current cycle) and the record's verification step (refresh the account page) with conditional follow-up. Answer 1 gives the available fix, the retry step from the record's next_steps, and conditional follow-up. Both expected issues are retained in the bundle and execution completed.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to check the updated status"
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please retry logging in now"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps",
+            "value": [
+              "Retry logging in."
+            ]
+          },
+          {
+            "path": "/execution_completed",
+            "value": true
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "Answer 0 reports the recorded display refresh and keeps verification with the customer via conditional follow-up, without claiming whole-case closure. Answer 1 describes an available fix and the recorded restart at its actual scope and requests a retry; it does not assert a definite completed repair ('fixed on our end/side'), so it stays within the supported boundary. No new-ticket demand is made for any included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If it still shows incorrectly after refreshing, let us know and we'll investigate further."
+          },
+          {
+            "answer_index": 1,
+            "quote": "A fix is available for the login issue: the authentication node has been restarted. Please retry logging in now."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-980056a457a0ab55",
+  "created": 1793822590,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"Both records match the requested issues: a sync_failure record with remediation detail and next steps, and an incorrect_invoice record with corrected amount, currency, and state. The sync record is marked non-authoritative but its content fits the request and supports an appropriate response.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"We've cleared the stuck sync queue on our end.\"},{\"answer_index\":1,\"quote\":\"Your invoice has been corrected and reissued at the accurate amount of $19.00 USD.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/sync_failure/record/detail\",\"value\":\"Sync queue flushed; re-enable sync.\"},{\"path\":\"/original_authoritative_records/incorrect_invoice/record/detail\",\"value\":\"Invoice reissued at correct amount.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"Each answer addresses its assigned issue only: the sync answer covers the sync_failure question and the billing answer covers the incorrect_invoice question, matching the two expected issues.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"Please re-enable sync on your device, then check whether your files now sync between devices.\"},{\"answer_index\":1,\"quote\":\"Your invoice has been corrected and reissued at the accurate amount of $19.00 USD.\"}],\"source_fields\":[{\"path\":\"/expected_issues\",\"value\":[\"incorrect_invoice\",\"sync_failure\"]},{\"path\":\"/user_request\",\"value\":\"I need help with my account. My files are not syncing between devices. The invoice amount looks incorrect.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"PASS\",\"explanation\":\"The sync answer's completed intervention (queue flushed) and next steps are supported by the record; no definite user-side repair is claimed. The invoice answer's amount ($19.00), currency (USD), and corrected/reissued state are all present in the authoritative record. No unsupported refund timing or destination is asserted.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"We've cleared the stuck sync queue on our end.\"},{\"answer_index\":1,\"quote\":\"Your invoice has been corrected and reissued at the accurate amount of $19.00 USD.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/sync_failure/record/detail\",\"value\":\"Sync queue flushed; re-enable sync.\"},{\"path\":\"/original_authoritative_records/incorrect_invoice/record/amount\",\"value\":19.0},{\"path\":\"/original_authoritative_records/incorrect_invoice/record/currency\",\"value\":\"USD\"},{\"path\":\"/original_authoritative_records/incorrect_invoice/record/state\",\"value\":\"corrected\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"Both expected issues are covered. The sync answer includes the remediation step (re-enable sync) and a verification step (check whether files sync), matching the record's next_steps. The invoice answer states the corrected amount and asks the customer to review the reissued invoice.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"Please re-enable sync on your device, then check whether your files now sync between devices.\"},{\"answer_index\":1,\"quote\":\"Please review the reissued invoice to confirm the details look right to you.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/sync_failure/record/next_steps\",\"value\":[\"Re-enable sync.\",\"Check whether files sync between devices.\"]},{\"path\":\"/expected_issues\",\"value\":[\"incorrect_invoice\",\"sync_failure\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"The sync answer reports the supported completed intervention (queue flushed) at its actual scope and asks the customer to retest, without claiming verified repair. The invoice answer reports the recorded corrected state and preserves customer verification. No new-ticket demand or unsupported whole-case closure is made.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If it still doesn't work after that, let us know.\"},{\"answer_index\":1,\"quote\":\"Please review the reissued invoice to confirm the details look right to you.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/sync_failure/record/state\",\"value\":\"fix_available\"},{\"path\":\"/original_authoritative_records/sync_failure/record/user_confirmation\",\"value\":\"not_observed\"},{\"path\":\"/original_authoritative_records/incorrect_invoice/record/state\",\"value\":\"corrected\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"PASS\",\"human_followup_needed\":false}",
+        "role": "assistant",
+        "reasoning_content": "Two answers. sync_failure: \"We've cleared the stuck sync queue on our end.\" Record says \"Sync queue flushed; re-enable sync.\" state fix_available. Is \"cleared the stuck sync queue\" supported? Record detail: \"Sync queue flushed\" — yes, supported. Then re-enable sync, check. That's supported next steps. No definite repair claim (\"check whether your files now sync\"). Grounding PASS. Coverage: includes remediation and verification. PASS. Relevance PASS. Status: describes completed intervention (queue flushed) at actual scope — supported. PASS.\n\nincorrect_invoice: \"corrected and reissued at the accurate amount of $19.00 USD\" — record: amount 19.0 USD, state corrected, \"Invoice reissued at correct amount.\" Supported. \"Please review the reissued invoice to confirm\" — fine. No refund timing/destination issues. PASS.\n\nRecord alignment: records fit requests. sync_failure record is authoritative:false but status ok, matches issue. Alignment PASS.\n\nOverall PASS, human_followup false? Rules: human follow-up true if any criterion non-PASS. All PASS → false.",
+        "provider_specific_fields": {
+          "reasoning": "Two answers. sync_failure: \"We've cleared the stuck sync queue on our end.\" Record says \"Sync queue flushed; re-enable sync.\" state fix_available. Is \"cleared the stuck sync queue\" supported? Record detail: \"Sync queue flushed\" — yes, supported. Then re-enable sync, check. That's supported next steps. No definite repair claim (\"check whether your files now sync\"). Grounding PASS. Coverage: includes remediation and verification. PASS. Relevance PASS. Status: describes completed intervention (queue flushed) at actual scope — supported. PASS.\n\nincorrect_invoice: \"corrected and reissued at the accurate amount of $19.00 USD\" — record: amount 19.0 USD, state corrected, \"Invoice reissued at correct amount.\" Supported. \"Please review the reissued invoice to confirm\" — fine. No refund timing/destination issues. PASS.\n\nRecord alignment: records fit requests. sync_failure record is authoritative:false but status ok, matches issue. Alignment PASS.\n\nOverall PASS, human_followup false? Rules: human follow-up true if any criterion non-PASS. All PASS → false."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1168,
+    "prompt_tokens": 4152,
+    "total_tokens": 5320,
+    "completion_tokens_details": {
+      "reasoning_tokens": 231
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}

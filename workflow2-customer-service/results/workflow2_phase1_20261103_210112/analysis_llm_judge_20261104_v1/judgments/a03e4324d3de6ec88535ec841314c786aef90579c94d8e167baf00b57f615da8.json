@@ -1,0 +1,135 @@
+{
+  "job_id": "a03e4324d3de6ec88535ec841314c786aef90579c94d8e167baf00b57f615da8",
+  "input_hash": "a03e4324d3de6ec88535ec841314c786aef90579c94d8e167baf00b57f615da8",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 719,
+  "evaluated_at": "2026-11-04T20:35:44.841181+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "The authoritative subscription_status record matches the requested scenario (wrong-looking subscription status) and provides the active-through-current-cycle status, refreshed display, and a refresh next step, which is sufficient to support the helper's answer. The observed record carries contradictory/unverified flags, but the answer's claims are supported by the clean authoritative record, so the environment fits the request.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our records show your subscription is active through the current billing cycle, and the account status display has been refreshed to reflect that."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          },
+          {
+            "path": "/observed_records/subscription_status/record/state",
+            "value": "CONTRADICTORY"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "The answer addresses the helper's assigned issue (subscription_status) directly; it is not required to cover the other helper's login_failure issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Our records show your subscription is active through the current billing cycle"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/user_request",
+            "value": "My subscription status looks wrong. Also, i cannot log in to my account."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "All material claims (active through current billing cycle, display refreshed, refresh-the-page next step, conditional follow-up) are supported verbatim by the authoritative subscription_status record. No refund timing/destination, invented facts, or unsupported completed actions are present.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to check the updated status. If it still shows incorrectly after refreshing, let us know and we'll investigate further."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "FAIL",
+        "explanation": "The subscription_status answer includes its needed conclusion and next step, but the bundle is incomplete: the expected login_failure issue has no retained answer at all, so the original request is not fully covered.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please refresh your account page to check the updated status."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          },
+          {
+            "path": "/user_request",
+            "value": "My subscription status looks wrong. Also, i cannot log in to my account."
+          }
+        ],
+        "omissions": [
+          {
+            "required": "A response resolving the login_failure issue (e.g., the recorded auth-node restart with retry instruction)",
+            "missing": "No answer exists for the login_failure expected issue; the answers array contains only the subscription_status helper",
+            "requirement_source_path": "/expected_issues/1"
+          }
+        ],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The answer reports the display refresh and active status at the recorded scope and asks the customer to recheck, preserving the need for verification; it makes no unsupported whole-case closure claim and does not demand a new ticket for any included issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "If it still shows incorrectly after refreshing, let us know and we'll investigate further."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "FAIL",
+    "human_followup_needed": true
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

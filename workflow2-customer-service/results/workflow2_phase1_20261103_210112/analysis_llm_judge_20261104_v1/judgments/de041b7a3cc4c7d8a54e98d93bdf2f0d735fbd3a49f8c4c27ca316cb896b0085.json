@@ -1,0 +1,193 @@
+{
+  "job_id": "de041b7a3cc4c7d8a54e98d93bdf2f0d735fbd3a49f8c4c27ca316cb896b0085",
+  "input_hash": "de041b7a3cc4c7d8a54e98d93bdf2f0d735fbd3a49f8c4c27ca316cb896b0085",
+  "prompt_hash": "a65f91e6e6935ee3b9a303510aeb112ef2d75580b230917f11ac473c8a11964a",
+  "config_hash": "5aae70cb2c9ab3d8a8b7e0760ab41bd677f938f4e9ce31f2dfaf40ca5e71050e",
+  "request_id": 183,
+  "evaluated_at": "2026-11-04T20:08:59.467639+00:00",
+  "model": "api-glm-5.3-flash",
+  "returned_model": "api-glm-5.3-flash",
+  "endpoint": "https://tritonai-api.ucsd.edu/v1",
+  "judgment": {
+    "criteria": {
+      "record_alignment": {
+        "label": "PASS",
+        "explanation": "Both supplied records match the requested scenarios: a login_failure record with a restarted auth node and retry step, and a subscription_status record confirming active status with a refresh step. They provide sufficient evidence for appropriate answers to both issues in the request.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication node, which should resolve the login issue."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your subscription is confirmed active through the current billing cycle"
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record",
+            "value": {
+              "detail": "Auth node restarted; retry login.",
+              "issue_type": "login_failure",
+              "next_steps": [
+                "Retry logging in."
+              ],
+              "record_id": "BASE-0028:login_failure",
+              "state": "fix_available",
+              "symptom": "Unable to log in.",
+              "user_confirmation": "not_observed"
+            }
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record",
+            "value": {
+              "detail": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed.",
+              "displayed_status": "active",
+              "issue_type": "subscription_status",
+              "next_steps": [
+                "Refresh the account page to check the updated status."
+              ],
+              "record_id": "BASE-0028:subscription_status",
+              "state": "active"
+            }
+          },
+          {
+            "path": "/user_request",
+            "value": "I need help with my account. I cannot log in to my account. My subscription status looks wrong."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "relevance": {
+        "label": "PASS",
+        "explanation": "Each answer addresses its assigned issue: the login answer addresses the login failure with a retry step, and the subscription answer addresses the subscription status question. Neither substitutes an unrelated issue.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please try logging in again now. If it still fails, let us know and we'll investigate further."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please refresh your account page to see the updated status."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/answers/0/assigned_issue",
+            "value": "login_failure"
+          },
+          {
+            "path": "/answers/1/assigned_issue",
+            "value": "subscription_status"
+          },
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "grounding": {
+        "label": "PASS",
+        "explanation": "Login answer uses prospective wording ('should resolve') consistent with the record's 'Auth node restarted; retry login' and does not claim verified repair. Subscription answer's active status, billing-cycle scope, and display refresh are all stated in the authoritative record. No invented refund timing/destination or material facts.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "We've restarted the authentication node, which should resolve the login issue."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Your subscription is confirmed active through the current billing cycle, and the account status display has been refreshed."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/detail",
+            "value": "Auth node restarted; retry login."
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/state",
+            "value": "fix_available"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/detail",
+            "value": "Subscription ledger confirms active status through the current billing cycle. Account status display has been refreshed."
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "coverage": {
+        "label": "PASS",
+        "explanation": "Both expected issues are covered by retained answers. The login answer includes the remediation (retry login) and a follow-up path; the subscription answer includes the conclusion (active through current billing cycle) and the verification step (refresh the account page).",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "Please try logging in again now. If it still fails, let us know and we'll investigate further."
+          },
+          {
+            "answer_index": 1,
+            "quote": "Please refresh your account page to see the updated status. If it still shows incorrectly after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/expected_issues",
+            "value": [
+              "subscription_status",
+              "login_failure"
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/login_failure/record/next_steps",
+            "value": [
+              "Retry logging in."
+            ]
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/next_steps",
+            "value": [
+              "Refresh the account page to check the updated status."
+            ]
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      },
+      "status_responsibility": {
+        "label": "PASS",
+        "explanation": "The login answer keeps prospective scope ('should resolve') without asserting verified repair despite user_confirmation being not_observed, and offers conditional follow-up. The subscription answer reports the recorded ledger state at its actual scope. No demand for a new ticket and no unsupported whole-case closure claims.",
+        "answer_excerpts": [
+          {
+            "answer_index": 0,
+            "quote": "which should resolve the login issue"
+          },
+          {
+            "answer_index": 1,
+            "quote": "If it still shows incorrectly after refreshing, let us know."
+          }
+        ],
+        "source_fields": [
+          {
+            "path": "/original_authoritative_records/login_failure/record/user_confirmation",
+            "value": "not_observed"
+          },
+          {
+            "path": "/original_authoritative_records/subscription_status/record/state",
+            "value": "active"
+          }
+        ],
+        "omissions": [],
+        "insufficient_evidence": []
+      }
+    },
+    "overall_verdict": "PASS",
+    "human_followup_needed": false
+  },
+  "provenance": "LLM-assessed, not human-verified"
+}

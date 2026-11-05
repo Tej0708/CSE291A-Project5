@@ -1,0 +1,42 @@
+{
+  "id": "chatcmpl-95c0c6a6b9627920",
+  "created": 1793823156,
+  "model": "api-glm-5.3-flash",
+  "object": "chat.completion",
+  "system_fingerprint": "vllm-0.32.1rc1.dev555+geca54bd1d-tp4-1a06b080",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "{\"criteria\":{\"record_alignment\":{\"label\":\"PASS\",\"explanation\":\"The password_reset record matches the requested scenario (non-working reset link) and provides the reissued link, delivery channel, and validity window needed for an appropriate response.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"A new password reset link has been sent to your account email\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/issue_type\",\"value\":\"password_reset\"},{\"path\":\"/original_authoritative_records/password_reset/record/detail\",\"value\":\"Reset link reissued, valid 30m.\"},{\"path\":\"/user_request\",\"value\":\"I am waiting for an update on my refund. Also, the password reset link does not work.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"relevance\":{\"label\":\"PASS\",\"explanation\":\"The answer addresses the helper's assigned password_reset issue; the refund is handled by the other helper's answer and is not required here.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"please use it within 30 minutes, as it expires after that\"}],\"source_fields\":[{\"path\":\"/answers/0/assigned_issue\",\"value\":\"password_reset\"},{\"path\":\"/expected_issues\",\"value\":[\"refund_status\",\"password_reset\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"grounding\":{\"label\":\"PASS\",\"explanation\":\"Delivery channel (account email), 30-minute validity, and the reissued link are all supported by the record; the reissue offer is prospective and no refund timing/destination is asserted in this answer.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"A new password reset link has been sent to your account email — please use it within 30 minutes, as it expires after that.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/delivery_channel\",\"value\":\"account email\"},{\"path\":\"/original_authoritative_records/password_reset/record/valid_for_minutes\",\"value\":30},{\"path\":\"/original_authoritative_records/password_reset/record/detail\",\"value\":\"Reset link reissued, valid 30m.\"}],\"omissions\":[],\"insufficient_evidence\":[]},\"coverage\":{\"label\":\"PASS\",\"explanation\":\"Includes the needed conclusion (new link issued) and the supported next step (use within 30 minutes) plus conditional follow-up, matching the record's next_steps.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"If the link still doesn't work after that, let us know and we can reissue it.\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/next_steps\",\"value\":[\"Use the reissued reset link within 30 minutes.\"]}],\"omissions\":[],\"insufficient_evidence\":[]},\"status_responsibility\":{\"label\":\"PASS\",\"explanation\":\"Describes an available fix (reissued link) at its actual scope without claiming verified repair, and keeps scope without demanding a new ticket for either included issue.\",\"answer_excerpts\":[{\"answer_index\":0,\"quote\":\"we can reissue it\"}],\"source_fields\":[{\"path\":\"/original_authoritative_records/password_reset/record/state\",\"value\":\"fix_available\"},{\"path\":\"/original_authoritative_records/password_reset/record/user_confirmation\",\"value\":\"not_observed\"}],\"omissions\":[],\"insufficient_evidence\":[]}},\"overall_verdict\":\"PASS\",\"human_followup_needed\":false}",
+        "role": "assistant",
+        "reasoning_content": "Assess the password_reset answer.\n\nRecord alignment: password_reset record exists, matches request (reset link doesn't work), state fix_available, reissued link valid 30m. Aligned. PASS.\n\nRelevance: answers assigned issue password_reset. PASS.\n\nGrounding: \"new password reset link has been sent to your account email\" — record says delivery_channel \"account email\", detail \"Reset link reissued, valid 30m\", state fix_available. \"sent\" — record says reissued; state fix_available, user_confirmation not_observed. Is \"has been sent\" an unsupported completed action? The record says \"Reset link reissued\" — reissued implies sent. Delivery channel account email. Seems supported. \"expires after 30 minutes\" — valid_for_minutes 30, supported. \"we can reissue it\" — prospective offer, fine. PASS. Grounding must cite original authoritative record fields — the password_reset record in original_authoritative_records (authoritative:false but present). Non-UNCERTAIN grounding must cite original authoritative record fields — the password_reset record is in original_authoritative_records. Fine.\n\nCoverage: needed conclusion — new link sent, use within 30 min, follow-up if fails. Record next_steps: use reissued link within 30 minutes. Covered. PASS.\n\nStatus_responsibility: doesn't claim verified repair; says link sent, use it, follow up if fails. fix_available state. No new ticket demand. PASS.\n\nBundle: expected_issues refund_status and password_reset. Earlier answer in same attempt covers refund_status: \"$15.00 USD was settled back to your card\" — record says \"Refund settled to card\", amount 15 USD, state completed. Destination \"card\" supported. Timing not asserted. That answer passes. Bundle coverage: both issues covered. Overall PASS.\n\nNote: password_reset record authoritative:false — but it's in original_authoritative_records, so it's the clean reference. Fine.\n\nOutput JSON.",
+        "provider_specific_fields": {
+          "reasoning": "Assess the password_reset answer.\n\nRecord alignment: password_reset record exists, matches request (reset link doesn't work), state fix_available, reissued link valid 30m. Aligned. PASS.\n\nRelevance: answers assigned issue password_reset. PASS.\n\nGrounding: \"new password reset link has been sent to your account email\" — record says delivery_channel \"account email\", detail \"Reset link reissued, valid 30m\", state fix_available. \"sent\" — record says reissued; state fix_available, user_confirmation not_observed. Is \"has been sent\" an unsupported completed action? The record says \"Reset link reissued\" — reissued implies sent. Delivery channel account email. Seems supported. \"expires after 30 minutes\" — valid_for_minutes 30, supported. \"we can reissue it\" — prospective offer, fine. PASS. Grounding must cite original authoritative record fields — the password_reset record in original_authoritative_records (authoritative:false but present). Non-UNCERTAIN grounding must cite original authoritative record fields — the password_reset record is in original_authoritative_records. Fine.\n\nCoverage: needed conclusion — new link sent, use within 30 min, follow-up if fails. Record next_steps: use reissued link within 30 minutes. Covered. PASS.\n\nStatus_responsibility: doesn't claim verified repair; says link sent, use it, follow up if fails. fix_available state. No new ticket demand. PASS.\n\nBundle: expected_issues refund_status and password_reset. Earlier answer in same attempt covers refund_status: \"$15.00 USD was settled back to your card\" — record says \"Refund settled to card\", amount 15 USD, state completed. Destination \"card\" supported. Timing not asserted. That answer passes. Bundle coverage: both issues covered. Overall PASS.\n\nNote: password_reset record authoritative:false — but it's in original_authoritative_records, so it's the clean reference. Fine.\n\nOutput JSON."
+        },
+        "refusal": null
+      },
+      "provider_specific_fields": {
+        "stop_reason": 154827,
+        "routed_experts": null,
+        "token_ids": null,
+        "weight_versions": null
+      },
+      "logprobs": null
+    }
+  ],
+  "usage": {
+    "completion_tokens": 1085,
+    "prompt_tokens": 4121,
+    "total_tokens": 5206,
+    "completion_tokens_details": {
+      "reasoning_tokens": 401
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "created_cache_tokens": 0
+    },
+    "cache_read_input_tokens": 2304
+  }
+}

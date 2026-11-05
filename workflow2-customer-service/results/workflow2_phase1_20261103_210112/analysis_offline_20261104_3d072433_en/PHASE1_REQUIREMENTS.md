@@ -1,0 +1,19 @@
+# Phase 1 requirements and evidence
+
+| Requirement | Existing evidence | Completion status | Gap / next action |
+|---|---|---|---|
+| Official Phase 1 rubric, submission format, and deadline | No original course instructions or PDF found; phase1_v1/COVERAGE.md is an internal project mapping | Requirements unclear | Confirm against course materials; do not treat an internal checklist as the official grading rubric. |
+| Workflow and task definition | README.md; csa_workflow/recovery.py; Router → Billing/Technical → QA → Router | Completed | Services read deterministic fixtures; no real refunds or user-device repairs are executed. |
+| Dataset selection and applicability | phase1_v1/selected_population.json, applicability.json, full_manifest.json | Completed | The selected 20/40 cases are all structurally eligible mixed-issue cases. Disclose selection bias, pilot reuse, and limited route diversity. |
+| Frozen design and clean baseline | Manifest: 20 × 4 × 3 × 1; NONE: 60/60 completed | Awaiting human review | Semantic quality of 60 clean runs and their 120 retained drafts remains unreviewed. |
+| Fault injection and activation | 180/180 ACTIVATED; exactly one mutation per fault run; paths in measurements.json | Completed | TIMEOUT is an immediate synthetic status. Adversarial inputs, stale outputs, and real transport deadlines are outside this design. |
+| unprotected / full_restart / always_verify | Frozen RecoveryRunner; 240 identity/receipt/source checks; existing offline tests | Completed | full_restart does not trigger a restart under QA_CORRUPTION; do not describe that outcome as successful restart recovery. |
+| 240-slot execution completeness | slots_240.csv, integrity.json, verifier_python39.txt | Completed | 240 completed; all five other execution states are zero; no extra or duplicate slots; no reruns needed. |
+| Version, logging, and continuation audit | Five validated continuation plans; hashes for 2,456 raw files; matching key source hashes across three runtime Git revisions | Completed | A complete dependency lock and endpoint were not recorded per run; exact environment equivalence is not established. |
+| Metrics and within-case pairing | phase1_v1/METRICS.md; scenario_policy_summary.csv; paired_slots.csv; paired_summary.csv | Completed | Single-repetition descriptive latency only; no stable-speedup or significance claims. Unknown USD and failed-call usage remain unavailable. |
+| Propagation, discarded calls, and recovery intervals | measurements.json paths/waste/policy_recovery; grouped repair latency | Completed | Structural accepted/completed does not establish semantic recovery success; overlapping timing measures must not be added. |
+| All drafts and latest-per-issue answer quality | 560 review rows: 480 retained, 80 discarded; six infrastructure drafts separate | Awaiting human review | Assess all five criteria with identity/hash checks and reviewer provenance. Human fields remain UNREVIEWED; second-review FAIL/UNCERTAIN decisions. |
+| Recovery success and clean-PASS conditional analysis | 180 fault runs: 100 policy-triggered repairs, 80 natural continuations | Awaiting human review | Semantic success is unavailable; the decisive reviewed-clean denominator is zero. Do not report 0/0 as 0%. |
+| Cross-version Python reproducibility | Strict Python 3.14 verification differs in floating-point last bits for seven slots; unchanged Python 3.9.6 verification passes | Optional compatibility repair | Reproduction with Python 3.9 is complete. Future interpreter support needs a separately versioned numerical protocol, not edits to raw results or weaker checks for this study. |
+
+Scope: phase1_v1 describes this 240-slot study. The 40-run QA-only plan in README/TEAM_HANDOFF/formal_experiment/PLAN.md belongs to an earlier milestone. It does not override this manifest, and Workflow 1's three repetitions must not be imported into this study.
