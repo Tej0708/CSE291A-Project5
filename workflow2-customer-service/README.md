@@ -1,167 +1,191 @@
-# Workflow 2 — current progress and team handoff
+# Workflow 2 — Customer-Service Billing Workflow
 
-Updated 2026-11-02. **Formal QA-corruption experiment preparation is complete; the formal experiment has NOT been run.** Restart and always-verify are not implemented. Preparation used offline scripted fixtures only, with no model/provider calls.
+A multi-agent customer-support workflow used to study how faults propagate
+through agent-to-agent handoffs and how different recovery strategies respond.
+It is one of the two workflows in the CSE 291A failure-propagation project; see
+the [top-level README](../README.md) for the overall methodology.
 
-## Current progress
+## What this workflow is
 
-- Completed the helper-scope fix and v3 clean baseline; preserved historical datasets, prompts, raw traces and assessment revisions.
-- Completed the bounded live pilot: eight completed runs, three activated mixed-issue fault cases and one non-activation control. Activation caused repeated work followed by continuation to unresolved work; this is not full-restart recovery.
-- Recorded the final pilot review and frozen evaluation rules. Latest-answer quality is 4 PASS / 4 FAIL runs; all 17 drafts contain 9 PASS / 8 FAIL. These judgments include preliminary Codex assessments and two scoped user adjudications, not blanket human sign-off.
-- Added a separate formal observer with invocation-time stage/iteration, symmetric clean/fault Router receipt/action records, linked run/event/call IDs and complete nullable provider usage.
-- Verified 20 mixed technical/billing cases from the dataset and froze **40 runs**: one clean + one `qa_first_missing_once_v1` per case, 10 clean-first / 10 fault-first, seed `20261102`, original budgets and pilot model/settings.
-- Offline validation passed **31 workflow tests + 9 review-tool tests**, including 160 plain/observed fixture comparisons. Preparation verified 374 pre-existing files unchanged; this handoff subsequently updates documentation only.
+A bounded support loop decomposes a free-text customer request into one or more
+issues, resolves each issue with a specialized helper, and checks the result
+before closing out:
 
-## Where teammates should align logging schema and metrics
-
-**Start with [TEAM_HANDOFF.md](TEAM_HANDOFF.md).** It maps each contract to its schema, implementation and tests, and distinguishes raw observations from derived metrics.
-
-| Need | Files to read |
-| --- | --- |
-| Logging event fields, IDs, stage/iteration, dependencies | [event.schema.json](formal_experiment/event.schema.json), [formal_observer.py](formal_observer.py) |
-| Raw per-run results, calls, usage, drafts and injection evidence | [result.schema.json](formal_experiment/result.schema.json), [formal_observer.py](formal_observer.py) |
-| Activation, repeated work, affected stages, overhead and paired deltas | [metrics.schema.json](formal_experiment/metrics.schema.json), [paired_result.schema.json](formal_experiment/paired_result.schema.json), `evaluate()` in [run_formal_experiment.py](run_formal_experiment.py) |
-| Answer-quality definitions and review fields | [BASELINE_EVALUATION_RULES.md](BASELINE_EVALUATION_RULES.md), [draft_assessment.schema.json](formal_experiment/draft_assessment.schema.json), [latest_answer_quality.schema.json](formal_experiment/latest_answer_quality.schema.json) |
-| Frozen cases, schedule and settings | [manifest.json](formal_experiment/manifest.json) |
-| Protocol, reproducible commands and remaining Phase 1 checklist | [PLAN.md](formal_experiment/PLAN.md) |
-| Test evidence and preservation | [Preparation report](formal_experiment/REPORT.md), [workflow tests](formal_experiment/tests.txt), [review-tool tests](formal_experiment/review_tests_with_loopback.txt) |
-| Final pilot findings and judgment provenance | [Final pilot report](results/workflow2_step3_pilot_local_20261102_120737/evaluation_user_adjudicated/REPORT.md) |
-
-## Next direction
-
-1. Align teammates on the logging and metric contracts linked above. Keep ledger completion, latest-per-issue answer quality and all-draft quality separate.
-2. Verify the frozen manifest and obtain explicit authorization before live execution. Do not change prompts/settings or add defenses inside this frozen experiment.
-3. Execute the 40-run schedule serially with fresh state per run. Keep skipped/ineligible/error/not-attempted slots; no replacement or outcome-dependent reruns.
-4. Inspect activation and Router-consumption evidence, perform offline review of every draft under the frozen rules, then publish paired overhead and separate quality results with explicit denominators.
-5. Consider restart and always-verify only as a later, separately specified implementation/evaluation phase with matching baselines.
-
-```sh
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python run_formal_experiment.py verify
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -v
-PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s human_review_tool -p 'test_*.py' -v
+```
+Router → (Technical | Billing) Helper → QA → Router → …
 ```
 
-The review-tool HTTP test needs local loopback permission. Future execution and offline evaluation commands are in [PLAN.md](formal_experiment/PLAN.md); they are not instructions to run the experiment now.
+- **Router** decomposes the user query into taxonomy issues and, on each turn,
+  picks the next unresolved issue to route. It trusts QA feedback verbatim (no
+  recovery), which is what lets a corrupted hint misdirect the loop.
+- **Technical / Billing helpers** answer a single issue using scenario-specific
+  simulated tool records ([csa_workflow/scenario_records.json](csa_workflow/scenario_records.json)).
+  Unsupported issues return `unavailable` rather than an unrelated generic record.
+- **QA** checks whether each expected issue is resolved with supporting
+  evidence, validates its own label shape, and emits feedback back to the Router.
 
----
+The agents are **deterministic (rule-based) by default** so the harness isolates
+*fault behavior* from model variance. An LLM backend (OpenAI) can be dropped in
+without changing the orchestration contract. The only guard against an infinite
+loop is the per-case iteration budget.
 
-The earlier v2 progress record below is retained for context. Its pending-work statements describe that milestone, not the current state above.
+Key modules live in [csa_workflow/](csa_workflow/):
 
-# Historical progress: v2 baseline
+| File | Responsibility |
+| --- | --- |
+| [orchestrator.py](csa_workflow/orchestrator.py) | Wires the Router → Helper → QA loop with the fault injector on stage boundaries |
+| [agents.py](csa_workflow/agents.py) | Router, Technical, Billing, and QA agents |
+| [faults.py](csa_workflow/faults.py) | Fault-injector middleware for the five fault types |
+| [recovery.py](csa_workflow/recovery.py) | Opt-in recovery runner (unprotected / full-restart / always-verify) |
+| [taxonomy.py](csa_workflow/taxonomy.py) | 10 issue types → 2 helper routes, plus Router keyword cues |
+| [services.py](csa_workflow/services.py) | Simulated tool records / scenario lookup |
+| [state.py](csa_workflow/state.py) | Per-issue ledger and workflow state |
+| [dataset.py](csa_workflow/dataset.py) | Loader for the support-case dataset |
 
-## Status at the v2 milestone
+## Dataset
 
-The customer-support workflow runs locally with both rule-based and LLM backends:
+[support_cases_unique40.jsonl](support_cases_unique40.jsonl) holds **200
+records**: 40 distinct base requests × 5 fault conditions. Each case records the
+expected issues, routing, final status, iteration budget, invariants, and the
+fault configuration. The 10 issue types route to two helpers:
 
-Router → Billing / Technical Helper → QA → Router
+- **Technical:** `installation_failure`, `login_failure`, `password_reset`,
+  `app_crash`, `sync_failure`
+- **Billing:** `subscription_status`, `charge_after_cancellation`,
+  `duplicate_charge`, `incorrect_invoice`, `refund_status`
 
-We have completed dataset cleanup, clean-baseline logging, QA label validation, and scenario-specific mock tool records. The latest v2 clean run has finished locally. Full answer review is pending.
+## Fault model
 
-Formal fault-injection measurements, full-restart recovery, and the always-verify comparison are not yet complete.
+Faults are injected as passive middleware that mutates a stage's output *before*
+the next agent consumes it. Five fault types, matching the dataset conditions:
 
-## Completed Work
+| Fault type | Injection point | Effect |
+| --- | --- | --- |
+| `none` | — | Clean control run |
+| `qa_corruption` | QA → Router feedback | Rewrites the `missing_issue` hint to misdirect the Router |
+| `helper_corruption` | Helper output | Corrupts a helper's answer/record |
+| `timeout` | Simulated tool call | Tool returns `timeout` instead of a record |
+| `prompt_injection` | Retrieved support text | Appends an adversarial payload to retrieved content |
 
-### 1. Dataset Review and Cleanup
+## Recovery policies
 
-- Reviewed the 40 original base requests and their expected issue labels.
-- Rewrote duplicate request texts to produce 40 distinct request strings.
-- Kept each request consistent across its five experimental variants.
-- Reclassified the former `ambiguous` cases as `multi_issue`, since they explicitly describe multiple issues.
-- Current dataset: `support_cases_unique40.jsonl`.
-- The file contains 200 records: 40 base requests × 5 conditions.
+The opt-in recovery runner compares three execution strategies against the clean
+baseline, all under the same one-effective-mutation-per-run fault model:
 
-Distinct wording does not imply 40 distinct problem types. Some requests intentionally share issue categories.
+- **`unprotected`** — fault-injected execution with no corrective intervention.
+- **`full_restart`** — restart the workflow after a fault is detected.
+- **`always_verify`** — validate intermediate outputs before downstream use.
 
-### 2. Clean-Baseline Audit Logging
+## Experiments we ran
 
-Added `run_clean_audit.py` to record:
+All experiments are **offline / scripted by default**; live model execution is
+opt-in and gated behind explicit flags and manifest verification.
 
-- Actual issue labels and routing.
-- Model prompts, responses, model name, and token usage.
-- Helper answers and tool records.
-- QA feedback and fallback decisions.
-- Workflow and model-call durations.
-- Source-code and dataset hashes.
-- Structural checks and an answer-review CSV.
+| Experiment | Script | What it does |
+| --- | --- | --- |
+| **Clean baseline audit** | [run_clean_audit.py](run_clean_audit.py) | Records the clean workflow (routing, prompts, responses, tokens, QA feedback, durations, hashes) without changing agent decisions. |
+| **Fault activation audit** | [run_fault_audit.py](run_fault_audit.py) | Confirms each fault hook actually activates and is consumed downstream — activation evidence, never recovery scoring. |
+| **Step 3 live pilot** | [run_live_pilot.py](run_live_pilot.py) | Bounded live pilot on a frozen case selection; produced the activation/continuation findings (not full-restart recovery). |
+| **Formal QA-corruption study** | [run_formal_experiment.py](run_formal_experiment.py) | Frozen 40-run paired experiment (20 clean + 20 `qa_first_missing_once_v1`), with a dedicated observer, manifest hashes, and offline metric/quality evaluation. |
+| **Recovery smoke pilot** | [run_recovery_smoke_pilot.py](run_recovery_smoke_pilot.py) | Bounded 12-run smoke test (BASE-0004 × 4 conditions × 3 policies) exercising the recovery runner with budget/USD gates. |
+| **Phase 1 full experiment** | [workflow2_phase1.py](workflow2_phase1.py) + [phase1_metrics.py](phase1_metrics.py) | Full applicability → prepare → execute → analyze pipeline across all scenarios and policies; evidence-only metric reduction. |
 
-Structural checks and answer correctness are evaluated separately. A `resolved` status does not automatically establish task success.
+Results are written to timestamped directories under [results/](results/). The
+formal-experiment contracts (logging schema, metrics, and quality rules) are
+documented in [TEAM_HANDOFF.md](TEAM_HANDOFF.md),
+[BASELINE_EVALUATION_RULES.md](BASELINE_EVALUATION_RULES.md), and
+[formal_experiment/PLAN.md](formal_experiment/PLAN.md).
 
-### 3. QA Label Fix
+> Scope note: `qa_corruption` activation causes repeated work followed by
+> continuation to unresolved work — this is *not* full-restart recovery. Ledger
+> completion is a control-flow/evidence status, not verified answer correctness.
 
-Previously, an invalid model label could be replaced by a valid label while its incorrect explanation remained unchanged.
+## Useful commands
 
-Updated `csa_workflow/llm.py` and `csa_workflow/agents.py` to:
+Run everything from the repository root with the project virtual environment.
+`PYTHONDONTWRITEBYTECODE=1` keeps the tree clean. Output directories must be new.
 
-- Give QA both resolved and unresolved issue lists.
-- Validate the model response shape and selected label.
-- Fall back to the first unresolved issue when necessary.
-- Generate the effective explanation from workflow state.
-- Preserve the raw model output and `fallback_used` in logs.
+### Clean baseline audit
 
-Validation occurs before the QA fault-injection hook, so controlled QA corruption remains possible.
+```sh
+# Rule-based (no model calls)
+.venv/bin/python run_clean_audit.py --path support_cases_unique40.jsonl --llm none
+# Live OpenAI backend (reads .env), single case
+.venv/bin/python run_clean_audit.py --path support_cases_unique40.jsonl --llm openai --case BASE-0022-NONE
+```
 
-### 4. Scenario-Specific Mock Tools — v2
+### Fault activation audit
 
-Reviewing the earlier baseline exposed mismatches between detailed requests and generic tool records. For example, a PDF-upload crash received a Settings-crash solution.
+```sh
+.venv/bin/python run_fault_audit.py --backend rule --output results/fault_audit_$(date +%Y%m%d_%H%M%S)
+.venv/bin/python run_fault_audit.py --fault qa_corruption --profile qa_first_missing_once_v1 \
+  --output results/fault_audit_qa_$(date +%Y%m%d_%H%M%S)
+```
 
-Added `csa_workflow/scenario_records.json` with:
+### Formal QA-corruption study
 
-- 40 synthetic scenarios.
-- 60 issue-specific records.
-- Matching initial records shared by clean and fault variants.
-- Explicit facts for subscription plans, installation errors, crash contexts, and billing outcomes.
+```sh
+.venv/bin/python run_formal_experiment.py prepare                         # build/refresh the frozen manifest
+.venv/bin/python run_formal_experiment.py verify                          # check nothing frozen has changed
+.venv/bin/python run_formal_experiment.py execute --output results/workflow2_formal_$(date +%Y%m%d_%H%M%S)
+.venv/bin/python run_formal_experiment.py evaluate --run-dir <run-dir> --output <run-dir>/metrics
+```
 
-Updated the workflow so that:
+`execute` makes live provider calls — run only after `verify` passes and the run
+is authorized. Editing any frozen file intentionally makes `verify` fail.
 
-- Tools select records using the base case ID and assigned issue.
-- Request text is checked against its scenario.
-- Helpers receive the original user request.
-- Unsupported issues return `unavailable` instead of an unrelated generic record.
-- Helper prompts request concise, evidence-grounded answers.
-- Audit logs use scenario-specific reference records and include the fixture hash.
+### Recovery smoke pilot
 
-These records are preauthored simulated environment facts, not real transactions or verified product fixes.
+```sh
+# Offline preparation (no network)
+.venv/bin/python run_recovery_smoke_pilot.py --output results/workflow2_recovery_smoke_prep_$(date +%Y%m%d_%H%M%S)
+# Live execution (reads .env); an optional verified pricing config enables the USD gate
+.venv/bin/python run_recovery_smoke_pilot.py --execute \
+  --output results/workflow2_recovery_smoke_local_$(date +%Y%m%d_%H%M%S)
+```
 
-## Validation Results
+### Phase 1 full experiment
 
-### Earlier Development Baseline: QA Fix + Generic Tools
+```sh
+.venv/bin/python workflow2_phase1.py applicability --output results/phase1_applicability.json
+.venv/bin/python workflow2_phase1.py prepare  --config <config.json> --output results/phase1_manifest.json
+.venv/bin/python workflow2_phase1.py execute  --manifest results/phase1_manifest.json --output results/workflow2_phase1_$(date +%Y%m%d_%H%M%S)
+.venv/bin/python workflow2_phase1.py analyze  --run-dir <run-dir> --output <run-dir>/analysis.json
+```
 
-- 40/40 runs completed without runtime errors.
-- 40/40 structural checks passed.
-- 20 QA model selections were valid; no fallback was needed.
-- 120 LLM calls and 22,142 reported tokens.
-- Total workflow time: approximately 106.95 seconds.
+### Tests
 
-Answer review nevertheless found unsupported claims and scenario/tool mismatches. These results are retained as development results, not final end-to-end success evidence.
+```sh
+# All workflow tests
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -v
+# Review-tool tests (needs local loopback permission for the HTTP test)
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s human_review_tool -p 'test_*.py' -v
+# A single suite
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest test_recovery_smoke_pilot -q
+```
 
-### v2 validation at that milestone
+## Repository layout
 
-- 17 offline regression tests passed.
-- Scripted-model tests covered all 40 clean requests.
-- Fixture checks covered all 200 variants.
-- Targeted tests confirmed that the four existing fault hooks remain observable.
-- The live BASE-0022 sample passed answer review: it correctly identified the annual plan and explained the corrected account display.
-- The full 40-case LLM run has completed locally; aggregate results and answer correctness still require review.
+```
+csa_workflow/                  Core workflow: agents, orchestrator, faults, recovery, taxonomy
+formal_experiment/             Frozen formal study: manifest, schemas, PLAN.md, REPORT.md
+human_review_tool/             Offline draft-review app and tests
+results/                       Timestamped experiment outputs (traces, metrics, answers)
+support_cases_unique40.jsonl   Dataset: 40 base requests × 5 fault conditions
+run_clean_audit.py             Clean baseline audit
+run_fault_audit.py             Fault activation audit
+run_live_pilot.py              Bounded Step 3 live pilot
+run_formal_experiment.py       Formal QA-corruption study (prepare/verify/execute/evaluate)
+run_recovery_smoke_pilot.py    Recovery smoke pilot (unprotected/full_restart/always_verify)
+workflow2_phase1.py            Phase 1 pipeline (applicability/prepare/execute/analyze)
+phase1_metrics.py              Evidence-only Phase 1 metric reduction
+test_*.py                      Offline regression suites
+```
 
-Offline scripted tests are not evidence of live-model accuracy.
+## Related docs
 
-## Known Limitations
-
-- Helper prompts reduce unsupported claims but do not guarantee factual correctness.
-- QA does not yet perform semantic verification of helper answers.
-- Internal evidence acceptance can still admit corrupted records.
-- Technical completion means providing applicable, evidence-backed remediation; successful user-side repair is not observed.
-- The rule classifier still overclassifies `subscription_status` in five cases.
-- In v2, those extra issues remain unresolved because no matching scenario record exists.
-- Existing fault configurations still need activation checks. An untriggered or ignored fault is not evidence of robustness.
-- The audit reference uses the same fixture service; semantic correctness still requires independent review.
-
-
-## Next steps recorded at the v2 milestone (superseded above)
-
-1. Review the latest v2 answers and confirm the run used the intended code and fixture versions.
-2. Finalize and document the task-success scoring criteria.
-3. Freeze the dataset, fixtures, code, and model configuration.
-4. Verify fault activation and downstream consumption before batch experiments.
-5. Measure fault propagation, affected stages, task success, extra calls/tokens, and latency.
-6. Implement and evaluate full restart and an always-verify comparison.
-
+- [TEAM_HANDOFF.md](TEAM_HANDOFF.md) — logging schema and metrics contracts
+- [BASELINE_EVALUATION_RULES.md](BASELINE_EVALUATION_RULES.md) — frozen answer-quality rubric
+- [formal_experiment/PLAN.md](formal_experiment/PLAN.md) — formal-study protocol and reproducible commands
+- [RECOVERY_SMOKE_PILOT.md](RECOVERY_SMOKE_PILOT.md) — recovery smoke-pilot details
+- [WORKFLOW2_HANDOFF.md](WORKFLOW2_HANDOFF.md) — earlier milestone handoff
