@@ -1,0 +1,199 @@
+{
+  "backend": "live",
+  "created_utc": "2026-11-04T05:21:06.666241+00:00",
+  "dataset_file": "fulfillment_eval.json",
+  "fault_specs": [
+    {
+      "case_id": "EVAL-2011",
+      "changes": {
+        "items.0.available_qty": 999
+      },
+      "description": "Inflate available stock so an insufficient-stock order appears fulfillable.",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "stage": "inventory_agent",
+      "surface": "tool_response",
+      "timeout_ms": 1500
+    }
+  ],
+  "key_before": {
+    "blocked": null,
+    "checked_at_utc": "2026-11-04T05:21:06.150413+00:00",
+    "max_budget": 50.0,
+    "rpm_limit": 100,
+    "spend": 0.00238435,
+    "tpm_limit": null
+  },
+  "kind": "workflow1_live_fault_recovery",
+  "max_api_calls": 75,
+  "max_estimated_cost_usd": 0.1,
+  "modes": [
+    "unprotected",
+    "full_restart",
+    "always_verify"
+  ],
+  "notes": [
+    "No production side effects; fulfillment tool actions operate on copied simulated state.",
+    "Full restart uses an oracle fault-applied trigger, subject to non-retryable error guards.",
+    "Always verify uses deterministic reference-artifact checks.",
+    "Held-out data is NOT automatically supplied; use this matrix as a pilot unless cases are independent.",
+    "No outcome-dependent resampling or substitution."
+  ],
+  "per_trial_model_budget": 15,
+  "per_trial_tool_budget": 60,
+  "planned_slots": [
+    {
+      "case_id": "EVAL-2011",
+      "condition": "clean",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "mode": "full_restart",
+      "pair_id": "1:E-FUL-01:full_restart",
+      "repetition": 1,
+      "stage": "inventory_agent",
+      "surface": "tool_response"
+    },
+    {
+      "case_id": "EVAL-2011",
+      "condition": "fault",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "mode": "full_restart",
+      "pair_id": "1:E-FUL-01:full_restart",
+      "repetition": 1,
+      "stage": "inventory_agent",
+      "surface": "tool_response"
+    },
+    {
+      "case_id": "EVAL-2011",
+      "condition": "clean",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "mode": "always_verify",
+      "pair_id": "1:E-FUL-01:always_verify",
+      "repetition": 1,
+      "stage": "inventory_agent",
+      "surface": "tool_response"
+    },
+    {
+      "case_id": "EVAL-2011",
+      "condition": "fault",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "mode": "always_verify",
+      "pair_id": "1:E-FUL-01:always_verify",
+      "repetition": 1,
+      "stage": "inventory_agent",
+      "surface": "tool_response"
+    },
+    {
+      "case_id": "EVAL-2011",
+      "condition": "clean",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "mode": "unprotected",
+      "pair_id": "1:E-FUL-01:unprotected",
+      "repetition": 1,
+      "stage": "inventory_agent",
+      "surface": "tool_response"
+    },
+    {
+      "case_id": "EVAL-2011",
+      "condition": "fault",
+      "fault_class": "accidental",
+      "fault_id": "E-FUL-01",
+      "fault_type": "incorrect_result",
+      "mode": "unprotected",
+      "pair_id": "1:E-FUL-01:unprotected",
+      "repetition": 1,
+      "stage": "inventory_agent",
+      "surface": "tool_response"
+    }
+  ],
+  "provider_prices": {
+    "fetched_at_utc": "2026-11-04T05:21:06.328907+00:00",
+    "input_cost_per_token": 1.5e-07,
+    "model": "api-glm-5.3-flash",
+    "output_cost_per_token": 5e-07,
+    "source_url": "https://tritonai-api.ucsd.edu/public/model_hub"
+  },
+  "repetitions": 1,
+  "seed": 20261103,
+  "simulation_only": false,
+  "source_manifest": {
+    "case_ids": [
+      "EVAL-2011"
+    ],
+    "code_sha256": {
+      "core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "core/agent.py": "b74b631c974f1b629e1f0024290b96c76b8587c641e379a3b8636f120e5a13b9",
+      "core/api_budget.py": "7c33a4b2cdfdd6eba833fcbd2890e3a5380d26f0b095344c01d59545d8b16dc2",
+      "core/artifact.py": "3b89ff3e51e96d6a057a123fe51ca6f6b99028575c771e503c0f8c4dde4d8271",
+      "core/budget.py": "b474b2737a6a77539c1027dddaf7f23ef8f07100bb5c8d289b12e6d0f46366ce",
+      "core/config.py": "38f67eaf4f97446a74825695516daaff9c59232a8eb0571b0c31c97d60851735",
+      "core/model_client.py": "e623710c4c4d061d4766f1b967a3f7929b8c87cc1786c43baae76696b5f29b98",
+      "core/trace.py": "977f2c7147722dcea1fdf540f638047d98eab169bb9da1b554ebfe6f9bbf7851",
+      "core/workflow.py": "ebf989594d9ccd91f6919e5a8b57aa0c5b9104e4c5b90fc97c6fdd378da2d56b",
+      "data/__init__.py": "8c538f843a228c91a53c1b49beb02888d6f8c6d1df4cf1810846ccfbb4191b83",
+      "data/loader.py": "604fb3ad4570e1a4412e4034aada3498e662caf11fdad30cf8f3666c28c15dd5",
+      "experiments/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "experiments/clean_baseline.py": "54849dedfbdba09e671c74ed281e40561e272bcea68e8e0042041dbf61f1d523",
+      "experiments/compare_recovery.py": "b1aa115a9e1d496095bc74958be11764e1b54f2179d0353c4be4dd5f9bb12145",
+      "experiments/metric_cases.py": "69a130c22532d6e4c46604c5c401692bda206b04356e32a970bf8b2dd6ea7190",
+      "experiments/metrics.py": "448b6416425d8254183c1f75761d3160901982b6fed11fc1b35710da6be166b3",
+      "experiments/propagation.py": "3a341f3d979d30a159690150587aa25cc84af8cbe48fe140e90a96f7bcd1532b",
+      "experiments/records.py": "312eb5fc4122e85c92303a2e4c70ef91c2360873ce85d288bf8e0071cea8d3d0",
+      "experiments/report.py": "0ae0d774bee08dc0efde0aaa776952962de64c7a3195537e30ac838fe929ff05",
+      "experiments/review_faults.py": "4f13bdb0d569be42ce03e906dc12abaec18f00e4d8c89f63c3afe23476e5a5d0",
+      "experiments/review_metrics.py": "8ac1a705d8ecb02fe9a57c8e493d6b324648536744995ecfb3f328ab3ed5dc0f",
+      "experiments/run_clean.py": "768dc79002b608a5f7558d995abbc6dae5675449418e07cf2c0f8a54c8f8c6e7",
+      "experiments/run_live_fault_recovery.py": "6a6f69580c2716da0cb6223118f758736162b85f0dc3b5808c4ee072e43a4d7d",
+      "experiments/scripted_model.py": "5b5f6428afa54149a8068afdde478768e3024d35be3c4549712f608062dc6ed1",
+      "main.py": "732c289d5096d1cbad14eb93b0d64b1a9b69e5c065ac91d01f2598f8c0b3096b",
+      "requirements.txt": "6f1226836ee6aa94aa86529ab6b96b9f4797dfd9ed99d690c788857f0eb9ad49",
+      "workflows/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "workflows/fulfillment/__init__.py": "797cf401a6385b88d2a0fae9e2f50d51193239252a29957e509a3a14d092ba36",
+      "workflows/fulfillment/agents.py": "ab72e692e44f4d8c76ce0736c2793ded3d4fa8b3df59797def11b3ebe1e5c1ab",
+      "workflows/fulfillment/checker.py": "101d65b08aea6ddf502c274da28890b0c36e2d5ef6c395d87dab48164a353acf",
+      "workflows/fulfillment/dataset.py": "f636c578ad3fc8375725a2750392fbfec160d5a3c2b039887d19581758f46574",
+      "workflows/fulfillment/faults.py": "5644f1037b9be7fa95e7205c19352e7d858e005b3ef88ecd43e294aa973aea5b",
+      "workflows/fulfillment/models.py": "9c16ca7918d2685050f2b687d7c08ffc02a214f51285b156180608fe501d2b9a",
+      "workflows/fulfillment/state.py": "8fb7a2879984d5f1dbeea6517c181bcd7885b0977e953fc6e9069a095546cdda",
+      "workflows/fulfillment/tools.py": "59fd5d3aaeaa6b48cd0fed7be2640c7a7afd67294b1f583bb5953bcbada28884",
+      "workflows/fulfillment/validation.py": "70af0e298b32958dc16ab286d34a1b1b40019f67cdfaa952eab587d3ea1f6ab1",
+      "workflows/fulfillment/verifier.py": "52cc7b0909195c7859bf368d2cb86fc69ba9ac3a56c8aad9b4d393252002fd23",
+      "workflows/fulfillment/workflow.py": "089c41d37abf55fe4dd245866ff5bf76d30b7c40be4cb2bb624e6e40c4a791ce",
+      "workflows/registry.py": "75e32929c82a9bcbcbcc3c612e8ea47e2da87891860bbc58a25f9ec614bcdba1"
+    },
+    "condition": "paired_fault_recovery",
+    "dataset_sha256": "37c3b12ee1bc79d8a2628a5f2b6df9de17c779daaa4ce6e85cd5581284943431",
+    "max_completion_tokens": 1024,
+    "min_request_interval_s": 1.0,
+    "model": "api-glm-5.3-flash",
+    "notes": [
+      "Each order starts from the same independent inventory snapshot.",
+      "Missing provider usage is unknown, never zero.",
+      "Latency includes instrumentation, network, and provider time.",
+      "No credentials or private endpoint URLs are saved; public price-source URLs may be included."
+    ],
+    "packages": {
+      "openai": "3.40.0",
+      "pydantic": "2.14.1",
+      "python-dotenv": "1.2.4"
+    },
+    "python_version": "3.12.3",
+    "repetitions": 1,
+    "request_timeout_s": 60.0,
+    "schema_version": 1,
+    "sdk_max_retries": 0,
+    "started_utc": "2026-11-04T05:21:06.669774+00:00",
+    "temperature": 0,
+    "workflow": "fulfillment"
+  }
+}

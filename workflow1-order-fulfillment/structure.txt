@@ -1,0 +1,59 @@
+cse291a-inventory/
+│
+├── main.py                         # CLI entry point; choose workflow/task/run mode
+├── requirements.txt                # pinned Python dependencies
+├── .env                            # local TritonAI credentials, not committed
+├── .env.example                    # example environment-variable names
+├── .gitignore
+├── README.md                       
+│
+├── data/
+│   ├── dataset.json                # immutable benchmark data for both workflows
+│   └── loader.py                   # loads/validates dataset.json
+│
+├── core/
+│   ├── __init__.py
+│   ├── config.py                   # loads env/config settings
+│   ├── model_client.py             # handles LLM inference through TritonAI
+│   ├── agent.py                    # shared structured-agent execution logic
+│   ├── artifact.py                 # common representation for agent outputs/dependencies
+│   ├── trace.py                    # JSONL logging for agents, tools, timing, tokens, etc.
+│   └── workflow.py                 # common workflow interface/result types
+│
+├── workflows/
+│   ├── __init__.py
+│   ├── registry.py                 # maps names like "fulfillment" to workflow classes
+│   │
+│   ├── fulfillment/
+│   │   ├── __init__.py
+│   │   ├── models.py               # Order, InventoryResult, Plan, etc. schemas
+│   │   ├── state.py                # mutable state for ONE fulfillment run
+│   │   ├── tools.py                # inventory/pricing/shipping/execution tools
+│   │   ├── agents.py               # Inventory, Pricing, Shipping, Planner, Executor
+│   │   ├── checker.py              # deterministic correctness/oracle checks
+│   │   ├── workflow.py             # fulfillment orchestration
+│   │   └── faults.py               # fulfillment-specific fault definitions later
+│   │
+│   └── support/
+│       ├── __init__.py
+│       ├── models.py               # Ticket, RouterResult, QAResult, etc. schemas
+│       ├── state.py                # mutable state for ONE support run
+│       ├── tools.py                # support/account/billing/technical tools
+│       ├── agents.py               # Router, specialist agents, QA, etc.
+│       ├── checker.py              # deterministic support-task correctness checks
+│       ├── workflow.py             # support workflow + bounded feedback loop
+│       └── faults.py               # support-specific fault definitions later
+│
+├── faults/                         # treat this section with a grain of salt, haven't got to it
+│   ├── __init__.py
+│   ├── definitions.py              # generic fault types/enums/config schemas
+│   ├── injector.py                 # shared mechanism for intercepting outputs/tools
+│   └── schedule.py                 # determines when/where a configured fault is injected
+│
+├── experiments/                    
+│   ├── run_clean.py                # clean-baseline experiments
+│   ├── run_faults.py               # fault-injection experiments later
+│   └── metrics.py                  # aggregate latency, tokens, success, propagation, etc.
+│
+└── logs/
+    └── ...                         # generated JSONL execution traces
